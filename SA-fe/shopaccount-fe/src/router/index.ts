@@ -1,15 +1,39 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
-import Login from '../views/login/Login.vue';
-
+import BasicLayout from '../views/BasicLayout.vue';
 Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/',
+    path: '/login',
     name: 'Login',
-    component: Login
+    component: () => import('../views/login/Login.vue')
+  },
+  {
+    path: '/',
+    component: BasicLayout,
+    children: [
+      {
+        path: '',
+        redirect: '/home'
+      },
+      {
+        path: 'home',
+        name: 'home',
+        component: () => import('../views/home/Home.vue')
+      },
+      {
+        path: 'shops',
+        name: 'shops',
+        component: () => import('../views/shops/Shops.vue')
+      },
+      {
+        path: 'salesStatus',
+        name: 'salesStatus',
+        component: () => import('../views/salesStatus/SalesStatus.vue')
+      }
+    ]
   },
   {
     path: '/about',

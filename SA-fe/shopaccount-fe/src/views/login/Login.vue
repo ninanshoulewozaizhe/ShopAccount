@@ -53,10 +53,13 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import { IRuleForm } from './typings';
 
-@Component
-export default class HelloWorld extends Vue {
-  ruleForm = {
+@Component({
+  name: 'login'
+})
+export default class Login extends Vue {
+  ruleForm: IRuleForm = {
     username: '',
     password: '',
     confirmPd: ''
