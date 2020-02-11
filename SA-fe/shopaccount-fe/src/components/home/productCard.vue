@@ -26,6 +26,7 @@ export default class ProductCard extends Vue {
 
 <style lang="scss" scoped>
 .card {
+  display: inline-block;
   width: 250px;
   height: 360px;
   
