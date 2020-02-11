@@ -9,7 +9,7 @@
       </div>
       <el-pagination class="pagination" layout="prev, pager, next" 
       :total="allProducts.length"
-      :size="8"
+      :page-size="showPageSize"
       @current-change="pageChange"></el-pagination>
     </div>
 </template>
