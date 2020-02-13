@@ -19,7 +19,7 @@ export default class ProductCard extends Vue {
 @Prop({ default: AppIcon }) readonly image?: any;
 @Prop() readonly name!: string;
 @Prop({default: 0 }) readonly salesVolume !: number;
-@Prop() readonly shop!: string;
+@Prop() readonly shop?: string;
 
 }
 </script>

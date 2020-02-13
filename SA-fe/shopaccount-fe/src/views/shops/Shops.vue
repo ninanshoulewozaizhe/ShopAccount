@@ -1,12 +1,15 @@
 <template>
   <div>
     <h3>店铺列表</h3>
-    <shop-card class="card" v-for="shop in showshops" :key="shop.id" 
-    :shopImg="shop.img"
-    :name="shop.name"
-    :salesVolume="shop.salesVolume"
-    :productAmount="shop.productAmount"
-    :preProductImgs="shop.preProductImgs"></shop-card>
+    <div  v-for="shop in showshops" :key="shop.id" @click="getShopDetail(shop.id)">
+      <shop-card class="card"
+      :shopImg="shop.img"
+      :name="shop.name"
+      :salesVolume="shop.salesVolume"
+      :productAmount="shop.productAmount"
+      :preProductImgs="shop.preProductImgs"
+      ></shop-card>
+    </div>
     <el-pagination class="pagination" layout="prev, pager, next" 
       :total="shopList.length"
       :page-size="showPageSize"
@@ -45,7 +48,6 @@ export default class Shops extends Vue {
     for (let i = 0; i < this.showPageSize && i < this.shopList.length; ++i) {
       this.showshops.push(this.shopList[i]);
     }
-    console.log(this.showshops, this.shopList, this.shopList.length);
   }
 
   pageChange(curPage: number) {
@@ -56,6 +58,15 @@ export default class Shops extends Vue {
     }
   }
 
+  getShopDetail(sid: number) {
+    console.log(sid);
+    this.$router.push({
+      name: 'shop-detail',
+      params: {
+        sid: String(sid)
+      }
+    });
+  }
 }
 </script>
 

@@ -13,7 +13,7 @@
       <div class="sales_detail_table">
         <h3>商品销量排行</h3>
         <el-table :data="tableData">
-          <el-table-column prop="product" label="商品" width="250"></el-table-column>
+          <el-table-column prop="name" label="商品" width="250"></el-table-column>
           <el-table-column prop="salesVolume" label="销量" width="180"></el-table-column>
           <el-table-column prop="shop" label="店铺" width="300"></el-table-column>
         </el-table>
@@ -23,6 +23,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import { IProductItem } from '@/views/home/typings';
 
 @Component({
   name: 'salesStatus'
@@ -39,23 +40,22 @@ export default class SalesStatus extends Vue {
       { 店铺: '1/6', 销量: 4593}
     ]
   };
-  tableData = [{
-    product: '韩版卫衣',
-    salesVolume: '11',
-    shop: '上海市普陀区金沙江路 1518 弄'
-  }, {
-    product: '韩版卫衣',
-    salesVolume: '11',
-    shop: '上海市普陀区金沙江路 1517 弄'
-  }, {
-    product: '韩版卫衣',
-    salesVolume: '11',
-    shop: '上海市普陀区金沙江路 1519 弄'
-  }, {
-    product: '韩版卫衣',
-    salesVolume: '11',
-    shop: '上海市普陀区金沙江路 1516 弄'
-  }];
+  tableData: IProductItem[] = [
+    {id: 1, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 2, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 3, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 4, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 5, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 6, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 7, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 8, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 9, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 10, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 11, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 12, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 13, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 14, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'}
+    ];
 }
 </script>
 
