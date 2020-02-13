@@ -11,9 +11,9 @@
         background-color="#20A4E5"
         text-color="#fff"
         active-text-color="#ffd04b">
-        <el-menu-item index="home">首页</el-menu-item>
-        <el-menu-item index="shops">店铺</el-menu-item>
-        <el-menu-item index="salesStatus">销售情况</el-menu-item>
+        <el-menu-item index="/home">首页</el-menu-item>
+        <el-menu-item index="/shops">店铺</el-menu-item>
+        <el-menu-item index="/salesStatus">销售情况</el-menu-item>
       </el-menu>
       <div class="user_container">
         <el-dropdown>
