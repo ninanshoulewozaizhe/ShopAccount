@@ -4,11 +4,15 @@
       <div>
         <h3>店内商品</h3>
       </div>
-      <product-card class="p_card" v-for="product in showProducts" 
-        :key="product.id" 
-        :name="product.name" 
-        :salesVolume="product.salesVolume"></product-card>
-      <span class="product_get_more">查看更多>></span>
+      <div class="products_container">
+        <div class="card_wrapper" v-for="product in showProducts" 
+          :key="product.id" @click="getProductDetail(product.id)">
+          <product-card class="p_card"  
+          :name="product.name" 
+          :salesVolume="product.salesVolume"></product-card>
+        </div>
+        <span class="product_get_more">查看更多>></span>
+      </div>
     </div>
     <div class="shop_sales_statistics">
       <div class="products_sales_today">
@@ -151,14 +155,28 @@ export default class ShopDetail extends Vue {
   datePickerChange() {
     console.log(this.salesDatePick);
   }
+
+  getProductDetail(pid: number) {
+    this.$router.push({
+      name: 'product-detail',
+      params: {
+        pid: String(pid)
+      }
+    });
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 .products_preview {
-  .p_card {
-    margin-right: 20px;
+  .card_wrapper {
+    display: inline-block;
+
+    .p_card {
+      margin-right: 20px;
+    }
   }
+  
 
   .product_get_more {
     position: relative;

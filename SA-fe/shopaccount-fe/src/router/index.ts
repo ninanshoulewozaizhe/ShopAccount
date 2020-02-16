@@ -37,6 +37,11 @@ const routes = [
         path: 'shop/:sid',
         name: 'shop-detail',
         component: () => import('../views/shopDetail/ShopDetail.vue')
+      },
+      {
+        path: 'product/:pid',
+        name: 'product-detail',
+        component: () => import('../views/productDetail/ProductDetail.vue')
       }
     ]
   },
