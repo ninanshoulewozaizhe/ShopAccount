@@ -11,8 +11,8 @@
           :name="product.name" 
           :salesVolume="product.salesVolume"></product-card>
         </div>
-        <span class="product_get_more">查看更多>></span>
-      </div>
+        <span class="product_get_more">店铺管理>></span>
+    </div>
     </div>
     <div class="shop_sales_statistics">
       <div class="products_sales_today">

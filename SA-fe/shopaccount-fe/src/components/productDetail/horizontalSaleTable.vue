@@ -7,7 +7,7 @@
         <div class="table_cell">总计</div>
       </div>
       <div class="table_row table_row_2">
-        <div class="table_head">销量</div>
+        <div class="table_head">数量</div>
         <div class="table_cell" v-for="(kind, index) in Object.keys(data)" :key="index">{{ data[kind] }}</div>
         <div class="table_cell">{{ salesSum }}</div>
       </div>
@@ -40,12 +40,12 @@ export default class HorizontalSaleTable extends Vue {
   text-align: center;
   line-height: 30px;
   .table_head {
-    border: 1px solid black;
+    border: 1px solid grey;
     width: 100px;
     height: 30px;
   }
   .table_cell {
-    border: 1px solid black;
+    border: 1px solid grey;
     border-left: 0px;
     width: 100px;
     height: 30px;

@@ -1,6 +1,9 @@
 <template>
   <div>
-    <h3>店铺列表</h3>
+    <div class="top_area">
+      <h3>店铺列表</h3>
+      <el-button class="add_new_shop">添加店铺</el-button>
+    </div>
     <div  v-for="shop in showshops" :key="shop.id" @click="getShopDetail(shop.id)">
       <shop-card class="card"
       :shopImg="shop.img"
@@ -59,7 +62,6 @@ export default class Shops extends Vue {
   }
 
   getShopDetail(sid: number) {
-    console.log(sid);
     this.$router.push({
       name: 'shop-detail',
       params: {
@@ -71,6 +73,16 @@ export default class Shops extends Vue {
 </script>
 
 <style lang="scss" scoped>
+.top_area {
+  position: relative;
+
+  .add_new_shop {
+    position: absolute;
+    top: 0;
+    left: 1000px;
+  }
+}
+
 .card {
   margin-bottom: 20px;
 }
