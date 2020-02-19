@@ -14,3 +14,9 @@ export interface IProductDetailItem {
     salesVolumes: number;
     type: IkindToStocks;
 }
+
+export interface IProductSalesItem {
+    type: string;
+    amount: number;
+    disable: boolean;
+}

@@ -13,7 +13,7 @@
           <div class="sales_statistic_btns_g1" v-if="!getSalesDetail">
             <el-button @click="getSalesDetailfn">查看销量详细统计</el-button>
             <el-button @click="showUpdateDialog = true">更新商品信息</el-button>
-            <el-button>更新商品销量</el-button>
+            <el-button @click="showSalesDialog = true">更新商品销量</el-button>
             <el-dialog class="p_info_dialog" title="更新信息" :visible.sync="showUpdateDialog">
               <div class="p_info_dialog_container">
                 <img class="p_info_img" :src="modifyProduct.img" alt="p_img">
@@ -67,23 +67,22 @@
                   </el-form-item>
                   <el-form-item label="销量更新">
                       <br/>
-                      <el-select>
+                      <el-select v-model="PSalesUpadteType">
                         <el-option
-                          v-for="item in options"
-                          :key="item.value"
-                          :label="item.label"
-                          :value="item.value"
+                          v-for="item in productSales"
+                          :key="item.type"
+                          :label="item.type"
+                          :value="item.type"
                           :disabled="item.disable">
                         </el-option>
                       </el-select> : 
-                      <el-input class="p_info_new_type_stocks_input" type="number" v-model="PNewTypeAmount"></el-input>
-                      <el-button type="primary" @click="updatePType">确定</el-button>
+                      <el-input class="p_info_new_type_stocks_input" type="number" v-model="PSalesUpadteAmount"></el-input>
+                      <el-button type="primary" @click="updatePSales">确定</el-button>
                     </el-form-item>
                 </el-form>
                 <div>
-                  <div class="type_list" v-for="type in Object.keys(modifyProduct.type)" :key="String(type)">
-                    <div>{{`${type} : ${modifyProduct.type[type]}`}}</div>
-                    <i class="el-icon-delete" @click="deletePType(type)"></i>
+                  <div class="type_list" v-for="item in productSales" :key="item.type">
+                    <div>{{`${item.type} : ${item.amount}`}}</div>
                   </div>
                 </div>
               </div>
@@ -136,7 +135,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import AppIcon from '../../../public/images/accountBook.jpg';
 import horizontalSaleTable from '@/components/productDetail/horizontalSaleTable.vue';
-import { IProductDetailItem, ISuggestObj } from './typings';
+import { IProductDetailItem, ISuggestObj, IProductSalesItem } from './typings';
 
 @Component({
   name: 'productDetail',
@@ -148,6 +147,8 @@ export default class ProductDetail extends Vue {
   recentSalesShow = 'today';
   getSalesDetail = false;
   showUpdateDialog = false;
+  showSalesDialog = false;
+  salesVolumesUpdateDate = new Date();
   product: IProductDetailItem = {
     id: 1,
     name: '韩版卫衣',
@@ -168,15 +169,35 @@ export default class ProductDetail extends Vue {
   modifyProduct: IProductDetailItem = JSON.parse(JSON.stringify(this.product));
   PNewType = '';
   PNewTypeAmount = 0;
-  productSales = {
-    'S': 12,
-    'M': 23,
-    'L': 12,
-    'XL': 23,
-    'XXL': 24,
-    '3XL': 21,
-    '4XL': 23
-  };
+  PSalesUpadteType = '';
+  PSalesUpadteAmount = 0;
+  productSales: IProductSalesItem[] = [
+    {
+      type: 'S',
+      amount: 12,
+      disable: false
+    },
+    {
+      type: 'M',
+      amount: 12,
+      disable: false
+    },
+    {
+      type: 'L',
+      amount: 12,
+      disable: true
+    },
+    {
+      type: 'XL',
+      amount: 12,
+      disable: false
+    },
+    {
+      type: 'XXL',
+      amount: 12,
+      disable: false
+    }
+  ];
 
   datePickerOptions = {
     shortcuts: [{
@@ -249,6 +270,16 @@ export default class ProductDetail extends Vue {
     this.PNewType = this.PNewType.trim();
     if (this.PNewType) {
       this.$set(this.modifyProduct.type, this.PNewType, this.PNewTypeAmount);
+    }
+  }
+
+  updatePSales() {
+    for (const item of this.productSales) {
+      if (item.type === this.PSalesUpadteType) {
+        this.$set(item, 'amount', +this.PSalesUpadteAmount);
+        console.log(this.productSales);
+        break;
+      }
     }
   }
 }

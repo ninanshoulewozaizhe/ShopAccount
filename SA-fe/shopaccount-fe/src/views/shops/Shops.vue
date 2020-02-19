@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="top_area">
+      <div class="top_area">
       <h3>店铺列表</h3>
       <el-button class="add_new_shop">添加店铺</el-button>
     </div>
