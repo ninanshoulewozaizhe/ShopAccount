@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { IProductItem } from '@/views/home/typings';
+import { IProductItem } from '@/typings/home/typings';
 
 @Component({
   name: 'salesStatus'

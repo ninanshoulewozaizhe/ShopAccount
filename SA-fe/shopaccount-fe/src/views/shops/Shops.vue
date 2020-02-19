@@ -23,7 +23,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import shopCard from '@/components/shops/shopCard.vue';
-import { IShopItem } from './typings';
+import { IShopItem } from '@/typings/shops/typings';
 import AppIcon from '../../../public/images/accountBook.jpg';
 
 @Component({

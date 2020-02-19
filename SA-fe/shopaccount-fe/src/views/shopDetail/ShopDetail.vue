@@ -49,7 +49,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import AppIcon from '../../../public/images/accountBook.jpg';
-import { IProductItem } from '@/views/home/typings';
+import { IProductItem } from '@/typings/home/typings';
 import productCard from '@/components/home/productCard.vue';
 
 @Component({

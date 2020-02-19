@@ -135,7 +135,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import AppIcon from '../../../public/images/accountBook.jpg';
 import horizontalSaleTable from '@/components/productDetail/horizontalSaleTable.vue';
-import { IProductDetailItem, ISuggestObj, IProductSalesItem } from './typings';
+import { IProductDetailItem, ISuggestObj, IProductSalesItem } from '@/typings/productDetail/typings';
 
 @Component({
   name: 'productDetail',
