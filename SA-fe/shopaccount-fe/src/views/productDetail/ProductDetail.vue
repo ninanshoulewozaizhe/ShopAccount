@@ -6,7 +6,7 @@
       <div class="p_info">
         <div>
           <div class="p_name">{{ product.name }}</div>
-          <div class="p_desc">{{ product.desc }}</div>
+          <div class="p_desc">{{ product.description }}</div>
         </div>
         <div class="bottom_container">
           <div class="p_sales_volumes">已卖 {{ product.salesVolumes }} 件</div>
@@ -19,7 +19,9 @@
                 <img class="p_info_img" :src="modifyProduct.img" alt="p_img">
                 <el-form>
                   <el-form-item label="商品名称">
-                    <el-input class="p_info_name_input" v-model="modifyProduct.name"></el-input>
+                    <el-input class="p_info_name_input"
+                    v-model="modifyProduct.name"
+                    placeholder="请输入名称"></el-input>
                   </el-form-item>
                   <el-form-item label="商品描述">
                     <el-input
@@ -135,7 +137,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import AppIcon from '../../../public/images/accountBook.jpg';
 import horizontalSaleTable from '@/components/productDetail/horizontalSaleTable.vue';
-import { IProductDetailItem, ISuggestObj, IProductSalesItem } from '@/typings/productDetail/typings';
+import { IProductDetailItem, ISuggestObj, IProductSalesItem } from '@/typing/productDetail/typings';
 
 @Component({
   name: 'productDetail',

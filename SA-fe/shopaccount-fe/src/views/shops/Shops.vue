@@ -23,7 +23,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import shopCard from '@/components/shops/shopCard.vue';
-import { IShopItem } from '@/typings/shops/typings';
+import { IShopPreItem } from '@/typing/shops/typings';
 import AppIcon from '../../../public/images/accountBook.jpg';
 
 @Component({
@@ -33,7 +33,7 @@ import AppIcon from '../../../public/images/accountBook.jpg';
   }
 })
 export default class Shops extends Vue {
-  shopList: IShopItem[] = [
+  shopList: IShopPreItem[] = [
     {id: 1, img: AppIcon, name: 'nice', salesVolume: 1, productAmount: 10, preProductImgs: [AppIcon, AppIcon, AppIcon]},
     {id: 2, img: AppIcon, name: 'nice', salesVolume: 1, productAmount: 10, preProductImgs: [AppIcon, AppIcon, AppIcon]},
     {id: 3, img: AppIcon, name: 'nice', salesVolume: 1, productAmount: 10, preProductImgs: [AppIcon, AppIcon, AppIcon]},
@@ -41,7 +41,7 @@ export default class Shops extends Vue {
     {id: 5, img: AppIcon, name: 'nice', salesVolume: 1, productAmount: 10, preProductImgs: [AppIcon, AppIcon, AppIcon]}
   ];
   showPageSize = 3;
-  showshops: IShopItem[] = [];
+  showshops: IShopPreItem[] = [];
 
   mounted() {
     this.showShopsInit();

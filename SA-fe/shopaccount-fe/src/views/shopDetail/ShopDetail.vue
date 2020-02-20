@@ -11,7 +11,7 @@
           :name="product.name" 
           :salesVolume="product.salesVolume"></product-card>
         </div>
-        <span class="product_get_more">店铺管理>></span>
+        <span class="product_get_more" @click="getShopManage">店铺管理>></span>
     </div>
     </div>
     <div class="shop_sales_statistics">
@@ -49,7 +49,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import AppIcon from '../../../public/images/accountBook.jpg';
-import { IProductItem } from '@/typings/home/typings';
+import { IProductItem } from '@/typing/home/typings';
 import productCard from '@/components/home/productCard.vue';
 
 @Component({
@@ -161,6 +161,16 @@ export default class ShopDetail extends Vue {
       name: 'product-detail',
       params: {
         pid: String(pid)
+      }
+    });
+  }
+
+  getShopManage() {
+    const sid = this.$route.params.sid;
+    this.$router.push({
+      name: 'shop-manage',
+      params: {
+        sid: String(sid)
       }
     });
   }

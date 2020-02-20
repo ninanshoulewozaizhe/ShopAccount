@@ -53,7 +53,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { IRuleForm } from '@/typings/login/typings';
+import { IRuleForm } from '@/typing/login/typings';
 
 @Component({
   name: 'login'
