@@ -1,28 +1,21 @@
 <template>
     <div>
-      <div>
-        <product-card class="p_card" v-for="product in showProducts" 
-        :key="product.id" 
-        :name="product.name" 
-        :shop="product.shop" 
-        :salesVolume="product.salesVolume"></product-card>
-      </div>
-      <el-pagination class="pagination" layout="prev, pager, next" 
-      :total="allProducts.length"
-      :page-size="showPageSize"
-      @current-change="pageChange"></el-pagination>
+      <product-list 
+      :allProducts="allProducts"
+      :showPageSize="showPageSize"
+      ></product-list>        
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import productCard from '@/components/home/productCard.vue';
+import productList from '@/components/home/productList.vue';
 import { IProductItem } from '@/typing/home/typings';
 
 @Component({
   name: 'home',
   components: {
-    productCard
+    productList
   }
 })
 export default class Home extends Vue {
@@ -43,26 +36,8 @@ export default class Home extends Vue {
     {id: 14, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'}
   ];
 
-  showProducts: IProductItem[] = [];
   showPageSize = 10;
 
-  mounted() {
-    this.showProductsInit();
-  }
-
-  showProductsInit() {
-    for (let i = 0; i < this.showPageSize && i < this.allProducts.length; ++i) {
-      this.showProducts.push(this.allProducts[i]);
-    }
-  }
-
-  pageChange(curPage: number) {
-    this.showProducts = [];
-    for (let i = this.showPageSize * (curPage - 1), time = 0;
-    time < this.showPageSize && i < this.allProducts.length; ++i, ++time) {
-      this.showProducts.push(this.allProducts[i]);
-    }
-  }
 }
 </script>
 

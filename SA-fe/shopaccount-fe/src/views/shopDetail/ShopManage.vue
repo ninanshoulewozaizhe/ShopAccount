@@ -93,6 +93,10 @@
     <div class="s_sales_preview" v-if="!getSalesDetail">
       <div class="product_list">
         <h3>商品列表</h3>
+        <product-list 
+        :allProducts="allProducts"
+        :showPageSize="showPageSize"
+        ></template>
       </div>
       <div class="products_sales_date">
         <h3>销量统计</h3>
@@ -120,12 +124,16 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import AppIcon from '../../../public/images/accountBook.jpg';
-import horizontalSaleTable from '@/components/productDetail/horizontalSaleTable.vue';
+import productList from '@/components/home/productList.vue';
 import { IProductDetailItem, ISuggestObj, IProductSalesItem } from '@/typing/productDetail/typings';
 import { IShopItem } from '@/typing/shops/typings';
+import { IProductItem } from '@/typing/home/typings';
 
 @Component({
-  name: 'shopManage'
+  name: 'shopManage',
+  components: {
+    productList
+  }
 })
 export default class ShopManage extends Vue {
   getSalesDetail = false;
@@ -153,6 +161,23 @@ export default class ShopManage extends Vue {
   };
   PNewType = '';
   PNewTypeAmount = 0;
+  allProducts: IProductItem[] = [
+    {id: 1, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 2, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 3, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 4, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 5, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 6, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 7, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 8, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 9, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 10, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 11, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 12, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 13, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
+    {id: 14, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'}
+  ];
+  showPageSize = 8;
 
   datePickerOptions = {
     shortcuts: [{
