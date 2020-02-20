@@ -39,6 +39,11 @@ const routes = [
         component: () => import('../views/shopDetail/ShopDetail.vue')
       },
       {
+        path: 'shopManage/:sid',
+        name: 'shop-manage',
+        component: () => import('../views/shopDetail/ShopManage.vue')
+      },
+      {
         path: 'product/:pid',
         name: 'product-detail',
         component: () => import('../views/productDetail/ProductDetail.vue')
