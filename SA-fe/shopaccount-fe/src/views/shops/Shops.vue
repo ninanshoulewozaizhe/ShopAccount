@@ -2,7 +2,33 @@
   <div>
       <div class="top_area">
       <h3>店铺列表</h3>
-      <el-button class="add_new_shop">添加店铺</el-button>
+      <el-button class="add_new_shop" @click="addShopDialog = true">添加店铺</el-button>
+        <el-dialog class="p_info_dialog" title="添加新店铺" :visible.sync="addShopDialog">
+          <div class="p_info_dialog_container">
+            <img class="p_info_img" :src="newShop.img" alt="p_img">
+            <el-form>
+              <el-form-item label="店铺名称">
+                <el-input class="p_info_name_input"
+                v-model="newShop.name"
+                placeholder="请输入名称"></el-input>
+              </el-form-item>
+              <el-form-item label="店铺描述">
+                <el-input
+                  class="p_info_desc_input"
+                  type="textarea"
+                  :rows="2"
+                  placeholder="请输入内容"
+                  v-model="newShop.description">
+                </el-input>
+              </el-form-item>
+            </el-form>
+            （店内商品在店铺管理中添加）
+          </div>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="addShopDialog = false">取 消</el-button>
+            <el-button type="primary" @click="addShopDialog = false">确 定</el-button>
+          </div>
+        </el-dialog>
     </div>
     <div  v-for="shop in showshops" :key="shop.id" @click="getShopDetail(shop.id)">
       <shop-card class="card"
@@ -23,7 +49,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import shopCard from '@/components/shops/shopCard.vue';
-import { IShopPreItem } from '@/typing/shops/typings';
+import { IShopPreItem, IShopItem } from '@/typing/shops/typings';
 import AppIcon from '../../../public/images/accountBook.jpg';
 
 @Component({
@@ -42,7 +68,15 @@ export default class Shops extends Vue {
   ];
   showPageSize = 3;
   showshops: IShopPreItem[] = [];
-
+  addShopDialog = false;
+  newShop: IShopItem = {
+    id: -1,
+    name: '',
+    description: '',
+    salesVolume: 0,
+    productAmount: 0,
+    img: AppIcon
+  };
   mounted() {
     this.showShopsInit();
   }
@@ -88,5 +122,22 @@ export default class Shops extends Vue {
 }
 .pagination {
   float: right;
+}
+
+.p_info_dialog_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  
+  .p_info_img {
+    width: 200px;
+    height: 250px;
+    margin-bottom: 15px;
+  }
+
+  .p_info_name_input, .p_info_desc_input {
+    width: 240px;
+  }
 }
 </style>

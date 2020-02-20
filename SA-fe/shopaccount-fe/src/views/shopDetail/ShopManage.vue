@@ -12,19 +12,19 @@
           <div class="s_sales_volumes">已卖 {{ shop.salesVolume }} 件</div>
           <div class="sales_statistic_btns_g1" v-if="!getSalesDetail">
             <el-button @click="getSalesDetailfn">查看销量详细统计</el-button>
-            <el-button @click="UpdateShopDialog = true">更新店铺信息</el-button>
+            <el-button @click="updateShopDialog = true">更新店铺信息</el-button>
             <el-button @click="AddNewProductDialog = true">添加商品</el-button>
             <el-button type="danger">删除店铺</el-button>
-            <el-dialog class="p_info_dialog" title="更新店铺信息" :visible.sync="UpdateShopDialog">
+            <el-dialog class="p_info_dialog" title="更新店铺信息" :visible.sync="updateShopDialog">
               <div class="p_info_dialog_container">
                 <img class="p_info_img" :src="modifyShop.img" alt="p_img">
                 <el-form>
-                  <el-form-item label="商品名称">
+                  <el-form-item label="店铺名称">
                     <el-input class="p_info_name_input"
                     v-model="modifyShop.name"
                     placeholder="请输入名称"></el-input>
                   </el-form-item>
-                  <el-form-item label="商品描述">
+                  <el-form-item label="店铺描述">
                     <el-input
                       class="p_info_desc_input"
                       type="textarea"
@@ -36,8 +36,8 @@
                 </el-form>
               </div>
               <div slot="footer" class="dialog-footer">
-                <el-button @click="UpdateShopDialog = false">取 消</el-button>
-                <el-button type="primary" @click="UpdateShopDialog = false">确 定</el-button>
+                <el-button @click="updateShopDialog = false">取 消</el-button>
+                <el-button type="primary" @click="updateShopDialog = false">确 定</el-button>
               </div>
             </el-dialog>
             <el-dialog class="p_info_dialog" title="添加商品" :visible.sync="AddNewProductDialog">
@@ -129,7 +129,7 @@ import { IShopItem } from '@/typing/shops/typings';
 })
 export default class ShopManage extends Vue {
   getSalesDetail = false;
-  UpdateShopDialog = false;
+  updateShopDialog = false;
   AddNewProductDialog = false;
   showSalesDialog = false;
   shop: IShopItem = {
