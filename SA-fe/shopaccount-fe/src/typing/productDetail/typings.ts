@@ -16,6 +16,8 @@ export interface IProductDetailItem {
     description: string;
     img: any;
     salesVolumes: number;
+    sid: number;
+    shop: string;
     type: IkindToStocks;
 }
 

@@ -1,7 +1,7 @@
 export interface IProductItem {
     id: number;
     name: string;
-    salesVolume: number;
+    salesVolumes: number;
     sid: number;
     shop: string;
 }
