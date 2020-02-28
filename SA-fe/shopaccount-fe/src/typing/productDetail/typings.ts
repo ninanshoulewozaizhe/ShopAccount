@@ -13,12 +13,14 @@ export interface IndexOJ {
 export interface IProductDetailItem {
     id: number;
     name: string;
-    description: string;
-    img: any;
+    description?: string;
+    img?: any;
     salesVolumes: number;
     sid: number;
     shop: string;
     type: IkindToStocks;
+    cost?: number;
+    price?: number;
 }
 
 export interface IProductSalesItem {

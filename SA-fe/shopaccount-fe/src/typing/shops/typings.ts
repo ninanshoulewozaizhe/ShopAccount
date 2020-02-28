@@ -1,9 +1,9 @@
 export interface IShopItem {
     id: number;
-    img: any;
+    img?: any;
     name: string;
     description?: string;
-    salesVolume: number;
+    salesVolumes: number;
     productAmount: number;
     preProductImgs?: any[];
 }
