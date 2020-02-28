@@ -1,7 +1,9 @@
 from flask import Flask, url_for, render_template
-from app.app import get_app_instance
+from app.app import app
+from app.database.models import db_init
 
-app = get_app_instance()
+# 数据库初始化
+# db_init()
 
 @app.route('/')
 def hello():
