@@ -22,6 +22,7 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sid = db.Column(db.Integer, db.ForeignKey('shop.id'))
     name = db.Column(db.String(32), nullable=False)
+    status = db.Column(db.String(10), nullable=False)
     description = db.Column(db.String(128))
     salesVolumes = db.Column(db.Integer, default=0)
     shop = db.Column(db.String(32), nullable=False)
