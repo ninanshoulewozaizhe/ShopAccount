@@ -35,7 +35,7 @@ class SalesVolumes(db.Model):
     __tablename__ = 'salesVolumes'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     pid = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
-    date = db.Column(db.Time, nullable=False)
+    date = db.Column(db.Date, nullable=False)
     sales = db.Column(db.Text)
 
 def db_init():

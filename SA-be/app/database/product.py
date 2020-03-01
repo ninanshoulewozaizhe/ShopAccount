@@ -5,6 +5,16 @@ from app.database import db
 
 preview_count = 4
 
+def create_product(product):
+    with db.auto_commit_db():
+        new_product = Product(name=product.name, status=product.status, description=product.description,
+            shop=product.shop, sid=product.sid, tpye=product.type, cost=product.cost,
+            price=product.price, img=product.img)
+        db.session.add(new_product)
+        db.session.flush()
+        pid = new_product.id
+    return True, pid
+
 def get_preview_prodcuts_by_sid(sid):
     products = Product.query.filyer_by(sid=sid).slice(0,preview_count).all()
     return products
@@ -32,6 +42,12 @@ def update_product_sales(pid, salesVolumes):
     product = Product.query.filter_by(id=pid).first()
     product.salesVolumes = salesVolumes
     db.session.commit()
+
+def increase_product_sales(pid, ISalesVolumes):
+    product = Product.query.filter_by(id=pid).first()
+    product.salesVolumes += ISalesVolumes
+    db.session.commit()
+
 
 def delete_product_by_pid(pid):
     product = Product.query.filter_by(id=pid).first()

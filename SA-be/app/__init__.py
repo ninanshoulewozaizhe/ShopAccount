@@ -2,7 +2,7 @@ from flask import Flask, url_for, render_template
 from app.app import app
 from app.database.models import db_init
 
-# 数据库初始化
+# #数据库初始化
 # db_init()
 
 @app.route('/')
