@@ -5,7 +5,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(32), nullable=False)
     password = db.Column(db.String(64), nullable=False)
-    email = db.Column(db.String(64))
+    phone = db.Column(db.String(20))
 
 class Shop(db.Model):
     __tablename__ = 'shop'
