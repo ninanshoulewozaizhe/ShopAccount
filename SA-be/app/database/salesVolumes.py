@@ -3,7 +3,7 @@ from app.database import db
 
 def create_new_record(record):
     with db.auto_commit_db():
-        new_sales = SalesVolumes(pid=record.pid, date=record.date, sales=record.sales)
+        new_sales = SalesVolumes(pid=record['pid'], date=record['date'], sales=record['sales'])
         db.session.add(new_sales)
         db.session.flush()
         uid = new_sales.id
@@ -20,15 +20,27 @@ def get_records_by_period(pid, start, end):
 
 def update_record_sales(pid, date, sales):
     record = SalesVolumes.query.filter_by(pid=pid, date=date).first()
-    record.sales = sales
-    db.session.commit()
+    if record is not None:
+        record.sales = sales
+        db.session.commit()
+        return True
+    else:
+        return False
 
 def delete_record(pid, date):
     record = SalesVolumes.query.filter_by(pid=pid, date=date).first()
-    db.session.delete(record)
-    db.session.commit()
+    if record is not None:
+        db.session.delete(record)
+        db.session.commit()
+        return True
+    else:
+        return False
 
 def delete_records_by_date(date):
     records = SalesVolumes.query.filter_by(date=date).all()
-    db.session.delete(records)
-    db.session.commit()
+    if records is not None:
+        db.session.delete(records)
+        db.session.commit()
+        return True
+    else:
+        return False

@@ -45,8 +45,8 @@ class Product(db.Model, Serializer):
     salesVolumes = db.Column(db.Integer, default=0)
     shop = db.Column(db.String(32), nullable=False)
     type = db.Column(db.Text)
-    cost = db.Column(db.Float)
-    price = db.Column(db.Float)
+    cost = db.Column(db.Float, default=0)
+    price = db.Column(db.Float, default=0)
     img = db.Column(db.String(128))
 
     def serialize(self):

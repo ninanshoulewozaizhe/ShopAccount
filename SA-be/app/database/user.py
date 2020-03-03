@@ -42,7 +42,12 @@ def user_verification(userInfo):
             return False, None
 
 def update_user_info(newInfo):
-   user = db.query(User).filter_by(username=newInfo['username']).first()
+   user = User.query.filter_by(username=newInfo['username']).first()
    user.password = hashlib.sha256(newInfo['password'].encode("utf-8")).hexdigest()
    user.phone = newInfo['phone']
    db.session.commit()
+
+def get_uid_by_username(username):
+   user = User.query.filter_by(username).first()
+   return user.id
+
