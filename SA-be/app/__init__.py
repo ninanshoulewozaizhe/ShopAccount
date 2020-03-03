@@ -22,10 +22,10 @@ def testimg():
 def login():
     if request.method == 'GET':
         if 'username' in session:
-            exist = username_exist(session['username'])
+            exist = username_exist(session.get('username'))
             if exist[0]:
-                logger.info(f'user login, username:{session['username']}')
-                return jsonify(status=True, message=f'user: {session['username']} login', data=exist[1])
+                logger.info(f'user login, username:{session.get("username")}')
+                return jsonify(status=True, message=f'user: {session.get("username")} login', data=exist[1].serialize())
             else:
                 return jsonify(status=False, message=f'user invaild', data='')
         else:
@@ -43,7 +43,8 @@ def login():
             available, user = user_verification(userInfo)
             if available:
                 session['username'] = userInfo['username']
-                return jsonify(status=True, message='ok', data=user)
+                session.permanent = True
+                return jsonify(status=True, message='ok', data=user.serialize())
             else:
                 return jsonify(status=False, message='user invaild', data='')
 
@@ -66,6 +67,13 @@ def register():
             return jsonify(status=True, message="succeed", data={'uid': uid})
         else:
             return jsonify(status=False, message="failed", data='')
+
+
+@app.route('/logout', methods=['PUT'])
+def logout():
+    logger.info(f'user: {session.get("username")} logout')
+    session.pop('username', None)
+    return jsonify(status=True, message="user logout", data='')
 
 # # 处理所有错误
 # @app.errorhandler(Exception)

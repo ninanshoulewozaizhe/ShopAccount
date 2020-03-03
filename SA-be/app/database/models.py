@@ -1,13 +1,27 @@
 from app.database import db
+from sqlalchemy.inspection import inspect
+class Serializer(object):
 
-class User(db.Model):
+    def serialize(self):
+        return {c: getattr(self, c) for c in inspect(self).attrs.keys()}
+
+    @staticmethod
+    def serialize_list(l):
+        return [m.serialize() for m in l]
+
+class User(db.Model, Serializer):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(32), nullable=False)
     password = db.Column(db.String(64), nullable=False)
     phone = db.Column(db.String(20))
 
-class Shop(db.Model):
+    def serialize(self):
+        d = Serializer.serialize(self)
+        del d['password']
+        return d
+
+class Shop(db.Model, Serializer):
     __tablename__ = 'shop'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     uid = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -17,7 +31,11 @@ class Shop(db.Model):
     productAmount = db.Column(db.Integer, default=0)
     img = db.Column(db.String(128))
 
-class Product(db.Model):
+    def serialize(self):
+        d = Serializer.serialize(self)
+        return d
+
+class Product(db.Model, Serializer):
     __tablename__ = 'product'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sid = db.Column(db.Integer, db.ForeignKey('shop.id'))
@@ -31,12 +49,20 @@ class Product(db.Model):
     price = db.Column(db.Float)
     img = db.Column(db.String(128))
 
-class SalesVolumes(db.Model):
+    def serialize(self):
+        d = Serializer.serialize(self)
+        return d
+
+class SalesVolumes(db.Model, Serializer):
     __tablename__ = 'salesVolumes'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     pid = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
     sales = db.Column(db.Text)
+
+    def serialize(self):
+        d = Serializer.serialize(self)
+        return d
 
 def db_init():
     # 初始化数据库
