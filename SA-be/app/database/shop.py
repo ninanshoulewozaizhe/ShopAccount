@@ -8,7 +8,7 @@ def create_shop(shop):
         db.session.add(new_shop)
         db.session.flush()
         sid = new_shop.id
-    return True, sid
+    return sid
 
 def get_user_all_shops(uid):
     shops = Shop.query.filter_by(uid=uid).all()

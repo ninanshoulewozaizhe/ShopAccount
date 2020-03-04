@@ -10,8 +10,12 @@ from app.database.product import create_product, get_preview_prodcuts_by_sid, \
     get_all_products_by_sid, update_product_info, update_product_img, \
     update_product_sales, increase_product_sales, delete_product_by_pid, \
     delete_products_by_sid, get_product_detail_by_pid
-from app.utils import form2Dict
+from app.database.salesVolumes import create_new_record, get_sales_one_day, \
+    get_records_by_period, update_record_sales, delete_records_by_date, \
+    delete_records_by_pid, delete_records_by_sid, delete_record    
+from app.utils import form2Dict, getSalesCountfromSalesStr
 from app.log import logger
+from datetime import date
 import json
 
 # #数据库初始化
@@ -87,8 +91,9 @@ def logout():
 def createProduct():
     productInfo = form2Dict(request.form, {'name': '', 'status':'on-sale', 'description': '', \
         'img': '', 'sid': '-1', 'shop': '', 'type':'', 'salesVolumes': 0, 'cost': 0, 'price': 0})
-    status = create_product(productInfo)
-    return jsonify(status=True, message='succeed', data={'pid': status[1]})
+    pid = create_product(productInfo)
+    increase_shop_product_amount(productInfo['sid'], 1)
+    return jsonify(status=True, message='succeed', data={'pid': pid})
 
 @app.route('/products', methods=['GET'])
 def getAllproducts():
@@ -101,8 +106,14 @@ def getAllproducts():
         allProducts.extend(Product.serialize_list(products))
     return jsonify(status=True, message='all products', data=allProducts)
 
+@app.route('/products/<int:sid>', methods=['GET'])
+def getShopProducts(sid):
+    products = get_all_products_by_sid(sid)
+    return jsonify(status=True, message='products in shop', data=Product.serialize_list(products))
+
 @app.route('/product/<int:pid>', methods=['GET', 'PUT', 'DELETE'])
-def getProductDetai(pid):
+def productHandler(pid):
+    # get product info
     if request.method == 'GET':
         product = get_product_detail_by_pid(pid).serialize()
         return jsonify(status=True, message='succeed', data=product)
@@ -115,13 +126,29 @@ def getProductDetai(pid):
             return jsonify(status=True, message='succeed', data='')
         else:
             return jsonify(status=False, message='failed', data='')
+    # delete product
     else:
+        delete_records_by_pid(pid)
+        status, sid = delete_product_by_pid(pid)
+        increase_shop_product_amount(sid, -1)
+        if status:
+            return jsonify(status=True, message='succeed', data='')
+        else:
+            return jsonify(status=False, message='failed', data='') 
         
 @app.route('/productImg/<int:pid>', methods=['PUT'])
 def updateProductImg(pid):
     pass
 
 # 店铺controller
+@app.route('/createShop', methods=['POST'])
+def createShop():
+    username = session.get('username')
+    uid = get_uid_by_username(username)
+    shopInfo = form2Dict(request.json, {'name': '', 'description': '', 'img': '', 'uid': uid})
+    sid = create_shop(shopInfo)
+    return jsonify(status=True, message='succeed', data={'sid': sid})
+
 @app.route('/shops', methods=['GET'])
 def getAllShops():
     username = session.get('username')
@@ -130,18 +157,31 @@ def getAllShops():
     shops = Shop.serialize_list(shops)
     return jsonify(status=True, message='all shops', data=shops)
 
-@app.route('/createShop', methods=['POST'])
-def createShop():
-    username = session.get('username')
-    uid = get_uid_by_username(username)
-    shopInfo = form2Dict(request.json, {'name': '', 'description': '', 'img': '', 'uid': uid})
-    status = create_shop(shopInfo)
-    return jsonify(status=True, message='succeed', data={'sid': status[1]})
 
-@app.route('/shop/<int:sid>', method=['GET'])
-def getShopDetail(sid):
-    shop = get_shop_detail(sid)
-    return jsonify(status=True, message='succeed', data=shop.serialize())
+@app.route('/shop/<int:sid>', method=['GET', 'PUT', 'DELETE'])
+def shopHandler(sid):
+    # get shop info
+    if request.method == 'GET':
+        shop = get_shop_detail(sid)
+        return jsonify(status=True, message='succeed', data=shop.serialize())
+    # update shop info
+    elif request.method == 'PUT':
+        shopInfo = form2Dict(request.json, {'id':'-1', 'name': '', 'description': ''})
+        status = update_shop_info(shopInfo)
+        if status:
+            return jsonify(status=True, message='succeed', data='')
+        else:
+            return jsonify(status=False, message='failed', data='')
+    # delete shop
+    else:
+        # 首先删除销量数据和店铺商品
+        delete_records_by_sid(sid)
+        delete_products_by_sid(sid)
+        status = delete_shop(sid)
+        if status:
+            return jsonify(status=True, message='succeed', data='')
+        else:
+            return jsonify(status=False, message='failed', data='')
 
 @app.route('/shopPreProducts/<int:sid>', method=['GET'])
 def getShopPreProducts(sid):
@@ -150,6 +190,57 @@ def getShopPreProducts(sid):
     products = Product.serialize_list(products)
     return jsonify(status=True, message='succeed', data=products)
     
+@app.route('/shopImg/<int:sid>', methods=['PUT'])
+def updateShopImg(sid):
+    pass
+
+# 销量记录controller
+@app.route('/createSalesRecord', methods=['POST'])
+def create_sales():
+    recordInfo = form2Dict(request.form, {'pid': '', 'sid': '', 'date': date.today().isoformat(), 'sales': ''})
+    rid = create_new_record(recordInfo)
+    salesCount = getSalesCountfromSalesStr(request.form.get('sales', {}))
+    # 更新商品、店铺销量
+    increase_product_sales(request.form.get('pid', -1), salesCount)
+    increase_shop_sales(request.form.get('sid', '-1'), salesCount)
+    return jsonify(status=True, message='succeed', data={'rid': rid})
+
+@app.route('/salesRecord/<int:pid>',['GET', 'PUT', 'DELETE'])
+def salesRecordHandler(pid):
+    # get record info
+    if request.method == 'GET':
+        rdate = request.args.get('date', date.today().isoformat())
+        rdate = date.fromisoformat(rdate)
+        sales = get_sales_one_day(pid, rdate)
+        return jsonify(status=True, message='succeed', date=sales)
+    # update record info
+    elif request.method == 'PUT':
+        recordDate = request.json.get('date', date.today().isoformat())
+        recordDate = date.fromisoformat(recordDate)
+        sales = request.json.get('sales', '')
+        status = update_record_sales(pid, recordDate, sales)
+        if status:
+            return jsonify(status=True, message='succeed', data='')
+        else:
+            return jsonify(status=False, message='failed', data='')
+    # delete record
+    else:
+        recordDate = request.json.get('date', date.today().isoformat())
+        recordDate = date.fromisoformat(recordDate)
+        status = delete_record(pid, recordDate)
+        if status:
+            return jsonify(status=True, message='succeed', data='')
+        else:
+            return jsonify(status=False, message='failed', data='')
+
+@app.route('/salesRecordsPeriod/<int:pid>', methods=['GET'])
+def getSalesRecordPeriod(pid):
+    dateFrom = request.args.get('from', date.today().isoformat())
+    dateTo = request.args.get('to', date.today().isoformat())
+    records = get_records_by_period(pid, dateFrom, dateTo)
+    records = SalesVolumes.serialize_list(records)
+    return jsonify(status=True, message='succeed', data='')
+
 
 
 # # 处理所有错误

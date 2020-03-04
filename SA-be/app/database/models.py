@@ -57,6 +57,7 @@ class SalesVolumes(db.Model, Serializer):
     __tablename__ = 'salesVolumes'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     pid = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    sid = db.Column(db.Integer, db.ForeignKey('shop.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
     sales = db.Column(db.Text)
 

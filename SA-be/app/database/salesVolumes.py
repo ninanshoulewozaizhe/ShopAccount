@@ -3,11 +3,11 @@ from app.database import db
 
 def create_new_record(record):
     with db.auto_commit_db():
-        new_sales = SalesVolumes(pid=record['pid'], date=record['date'], sales=record['sales'])
+        new_sales = SalesVolumes(pid=record['pid'], sid=record['sid'], date=record['date'], sales=record['sales'])
         db.session.add(new_sales)
         db.session.flush()
-        uid = new_sales.id
-    return uid
+        rid = new_sales.id
+    return rid
 
 def get_sales_one_day(pid, date):
     record = SalesVolumes.query.filter_by(pid=pid, date=date).first()
@@ -38,6 +38,24 @@ def delete_record(pid, date):
 
 def delete_records_by_date(date):
     records = SalesVolumes.query.filter_by(date=date).all()
+    if records is not None:
+        db.session.delete(records)
+        db.session.commit()
+        return True
+    else:
+        return False
+
+def delete_records_by_pid(pid):
+    records = SalesVolumes.query.filter_by(pid=pid).all()
+    if records is not None:
+        db.session.delete(records)
+        db.session.commit()
+        return True
+    else:
+        return False
+
+def delete_records_by_sid(sid):
+    records = SalesVolumes.query.filter_by(sid=sid).all()
     if records is not None:
         db.session.delete(records)
         db.session.commit()

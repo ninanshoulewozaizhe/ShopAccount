@@ -11,7 +11,7 @@ def create_product(product):
         db.session.add(new_product)
         db.session.flush()
         pid = new_product.id
-    return True, pid
+    return pid
 
 def get_preview_prodcuts_by_sid(sid, preview_count):
     products = Product.query.filyer_by(sid=sid).slice(0,preview_count).all()
@@ -69,12 +69,13 @@ def increase_product_sales(pid, ISalesVolumes):
 
 def delete_product_by_pid(pid):
     product = Product.query.filter_by(id=pid).first()
+    sid = product.sid
     if product is not None:
         db.session.delete(product)
         db.session.commit()
-        return True
+        return True, sid
     else:
-        return False
+        return False, -1
 
 def delete_products_by_sid(sid):
     products = Product.query.filter_by(sid=sid).all()
