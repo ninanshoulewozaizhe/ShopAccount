@@ -1,13 +1,15 @@
 from app.database.models import Shop
 from app.database import db
+from app.log import logger
 
 
 def create_shop(shop):
     with db.auto_commit_db():
-        new_shop = shop(name=shop['name'], description=shop['description'], img=shop['img'], uid=shop['uid'])
+        new_shop = Shop(name=shop['name'], description=shop['description'], img=shop['img'], uid=shop['uid'])
         db.session.add(new_shop)
         db.session.flush()
         sid = new_shop.id
+        logger.info(f'shop create succeed, sid: {sid}')
     return sid
 
 def get_user_all_shops(uid):

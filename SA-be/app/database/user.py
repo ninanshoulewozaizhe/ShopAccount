@@ -48,6 +48,6 @@ def update_user_info(newInfo):
     db.session.commit()
 
 def get_uid_by_username(username):
-   user = User.query.filter_by(username).first()
+   user = User.query.filter_by(username=username).first()
    return user.id
 

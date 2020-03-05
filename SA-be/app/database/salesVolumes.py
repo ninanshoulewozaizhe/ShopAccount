@@ -1,5 +1,6 @@
 from app.database.models import SalesVolumes
 from app.database import db
+from app.log import logger
 
 def create_new_record(record):
     with db.auto_commit_db():
@@ -32,33 +33,27 @@ def delete_record(pid, date):
     if record is not None:
         db.session.delete(record)
         db.session.commit()
+        logger.info(f'delete record (pid:{pid}, date:{date}) succeed')
         return True
     else:
+        logger.info(f'delete record (pid:{pid}, date:{date}) failed, record not exists')
         return False
 
 def delete_records_by_date(date):
-    records = SalesVolumes.query.filter_by(date=date).all()
-    if records is not None:
-        db.session.delete(records)
-        db.session.commit()
-        return True
-    else:
-        return False
+    SalesVolumes.query.filter_by(date=date).delete()
+    db.session.commit()
+    logger.info(f'delete records (date:{date}) succeed')
+    return True
+
 
 def delete_records_by_pid(pid):
-    records = SalesVolumes.query.filter_by(pid=pid).all()
-    if records is not None:
-        db.session.delete(records)
-        db.session.commit()
-        return True
-    else:
-        return False
+    SalesVolumes.query.filter_by(pid=pid).delete()
+    db.session.commit()
+    logger.info(f'delete records (pid:{pid}) succeed')
+    return True
 
 def delete_records_by_sid(sid):
-    records = SalesVolumes.query.filter_by(sid=sid).all()
-    if records is not None:
-        db.session.delete(records)
-        db.session.commit()
-        return True
-    else:
-        return False
+    SalesVolumes.query.filter_by(sid=sid).delete()
+    db.session.commit()
+    logger.info(f'delete records (sid:{sid}) succeed')
+    return True

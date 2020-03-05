@@ -1,7 +1,5 @@
 from app.database.models import Product
 from app.database import db
-from app.database.models import Product
-from app.database import db
 
 def create_product(product):
     with db.auto_commit_db():
@@ -78,11 +76,7 @@ def delete_product_by_pid(pid):
         return False, -1
 
 def delete_products_by_sid(sid):
-    products = Product.query.filter_by(sid=sid).all()
-    if products is not None:
-        db.session.delete(products)
-        db.session.commit()
-        return True
-    else:
-        return False
+    Product.query.filter_by(sid=sid).delete()
+    db.session.commit()
+    return True
 
