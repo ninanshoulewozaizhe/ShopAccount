@@ -1,5 +1,6 @@
 from app.database.models import Product
 from app.database import db
+import json
 
 def create_product(product):
     with db.auto_commit_db():
@@ -51,6 +52,23 @@ def update_product_sales(pid, salesVolumes):
     product = Product.query.filter_by(id=pid).first()
     if product is not None:
         product.salesVolumes = salesVolumes
+        db.session.commit()
+        return True
+    else:
+        return False
+
+def update_product_inventory(pid, increase, sales):
+    product = Product.query.filter_by(id=pid).first()
+    if product is not None:
+        originTypeInventory = json.loads(json.dumps(product.type))
+        sales = json.loads(json.dumps(sales))
+        for key in sales.keys():
+            if key in originTypeInventory.keys():
+                if increase:
+                    originTypeInventory[key] += sales[key]
+                else:
+                    originTypeInventory[key] -= sales[key]
+        product.type = json.dumps(originTypeInventory)
         db.session.commit()
         return True
     else:
