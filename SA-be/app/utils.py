@@ -8,7 +8,7 @@ def form2Dict(form, key_dict):
 
 def getSalesCountfromSalesStr(sales):
     result = 0
-    sales = json.loads(json.dumps(sales))
-    for value in sales.value():
+    sales = json.loads(sales)
+    for value in sales.values():
         result += value
     return result

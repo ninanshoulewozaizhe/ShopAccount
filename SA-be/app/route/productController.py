@@ -11,6 +11,7 @@ from app.utils import form2Dict, getSalesCountfromSalesStr
 from app.log import logger
 from datetime import date
 import json
+import ast
 from app.route.requestHandler import user_session_check
 
 product_controller = Blueprint('product_controller', __name__)
@@ -20,7 +21,8 @@ product_controller.before_request(user_session_check)
 @product_controller.route('/product', methods=['POST'])
 def createProduct():
     productInfo = form2Dict(request.form, {'name': '', 'status':'on-sale', 'description': '', \
-        'img': '', 'sid': '-1', 'shop': '', 'type':'', 'salesVolumes': 0, 'cost': 0, 'price': 0})
+        'img': '', 'sid': '-1', 'shop': '', 'type':'', 'salesVolumes': 0})
+    productInfo['type'] = json.dumps(ast.literal_eval(productInfo['type']))
     pid = create_product(productInfo)
     increase_shop_product_amount(productInfo['sid'], 1)
     return jsonify(status=True, message='succeed', data={'pid': pid})
@@ -43,7 +45,7 @@ def getShopProducts(sid):
     if products is not None:
         products = Product.serialize_list(products)
         for product in products:
-            product['type'] = json.loads(json.dumps(product["type"]))
+            product['type'] = json.loads(product["type"])
         return jsonify(status=True, message='products in shop', data=products)
     else:
         return jsonify(status=False, message='shop has no products', data='')
@@ -56,7 +58,7 @@ def productHandler(pid):
         product = get_product_detail_by_pid(pid)
         if product is not None:
             product = product.serialize()
-            product["type"] = json.loads(json.dumps(product["type"]))
+            product["type"] = json.loads(product["type"])
             return jsonify(status=True, message='succeed', data=product)
         else:
             return jsonify(status=False, message='product does not exist', data='')
@@ -64,6 +66,7 @@ def productHandler(pid):
     elif request.method == 'PUT':
         productInfo = form2Dict(request.json, {'id':'-1', 'name': '', 'status':'on-sale', \
             'description': '', 'type':'', 'cost': 0, 'price': 0})
+        productInfo['type'] = json.dumps(ast.literal_eval(productInfo['type']))
         status = update_product_info(productInfo)
         if status:
             return jsonify(status=True, message='succeed', data='')

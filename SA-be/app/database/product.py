@@ -1,12 +1,12 @@
 from app.database.models import Product
 from app.database import db
 import json
+import ast
 
 def create_product(product):
     with db.auto_commit_db():
         new_product = Product(name=product['name'], status=product['status'], description=product['description'],
-            shop=product['shop'], sid=product['sid'], type=product['type'], cost=product['cost'],
-            price=product['price'], img=product['img'])
+            shop=product['shop'], sid=product['sid'], type=product['type'], img=product['img'])
         db.session.add(new_product)
         db.session.flush()
         pid = new_product.id
@@ -32,8 +32,6 @@ def update_product_info(newInfo):
         product.description = newInfo['description']
         product.status = newInfo['status']
         product.type = newInfo['type']
-        product.cost = newInfo['cost']
-        product.price = newInfo['price']
         db.session.commit()
         return True
     else:
@@ -60,8 +58,8 @@ def update_product_sales(pid, salesVolumes):
 def update_product_inventory(pid, increase, sales):
     product = Product.query.filter_by(id=pid).first()
     if product is not None:
-        originTypeInventory = json.loads(json.dumps(product.type))
-        sales = json.loads(json.dumps(sales))
+        originTypeInventory = json.loads(product.type)
+        sales = json.loads(sales)
         for key in sales.keys():
             if key in originTypeInventory.keys():
                 if increase:
@@ -85,8 +83,8 @@ def increase_product_sales(pid, ISalesVolumes):
 
 def delete_product_by_pid(pid):
     product = Product.query.filter_by(id=pid).first()
-    sid = product.sid
     if product is not None:
+        sid = product.sid
         db.session.delete(product)
         db.session.commit()
         return True, sid

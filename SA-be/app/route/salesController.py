@@ -10,6 +10,7 @@ from app.utils import form2Dict, getSalesCountfromSalesStr
 from app.log import logger
 from datetime import date
 import json
+import ast
 from app.route.requestHandler import user_session_check
 
 sales_controller = Blueprint('sales_controller', __name__)
@@ -19,6 +20,8 @@ sales_controller.before_request(user_session_check)
 @sales_controller.route('/createSalesRecord', methods=['POST'])
 def createSalesRecord():
     recordInfo = form2Dict(request.form, {'pid': '', 'sid': '', 'date': date.today().isoformat(), 'sales': ''})
+    recordInfo['date'] = date.fromisoformat(recordInfo['date'])
+    recordInfo['sales'] = json.dumps(ast.literal_eval(recordInfo['sales']))
     rid = create_new_record(recordInfo)
     salesCount = getSalesCountfromSalesStr(recordInfo['sales'])
     # 更新库存
@@ -40,11 +43,11 @@ def salesRecordHandler(pid):
     elif request.method == 'PUT':
         recordDate = request.json.get('date', date.today().isoformat())
         recordDate = date.fromisoformat(recordDate)
-        newSales = request.json.get('sales', '')
+        newSales = json.dumps(ast.literal_eval(request.json.get('sales', '')))
         # 更新记录表
         originRecord = get_sales_one_day(pid, recordDate)
         if originRecord is not None:
-            originSalesCount = getSalesCountfromSalesStr(originRecord)
+            originSalesCount = getSalesCountfromSalesStr(originRecord['sales'])
             newSalesCount = getSalesCountfromSalesStr(newSales)
             # 更新各销量
             update_record_sales(pid, recordDate, newSales)
@@ -62,7 +65,7 @@ def salesRecordHandler(pid):
         recordDate = date.fromisoformat(recordDate)
         originRecord = get_sales_one_day(pid, recordDate)
         if originRecord  is not None:
-            originSalesCount = getSalesCountfromSalesStr(originRecord)
+            originSalesCount = getSalesCountfromSalesStr(originRecord['sales'])
             # 减少商品销量
             increase_shop_sales(originRecord['sid'], -originSalesCount)
             increase_product_sales(pid, -originSalesCount)
@@ -77,6 +80,6 @@ def salesRecordHandler(pid):
 def getSalesRecordPeriod(pid):
     dateFrom = request.args.get('from', date.today().isoformat())
     dateTo = request.args.get('to', date.today().isoformat())
-    records = get_records_by_period(pid, dateFrom, dateTo)
+    records = get_records_by_period(pid, date.fromisoformat(dateFrom), date.fromisoformat(dateTo))
     records = SalesVolumes.serialize_list(records)
     return jsonify(status=True, message='succeed', data='')
