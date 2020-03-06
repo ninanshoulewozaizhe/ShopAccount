@@ -32,8 +32,11 @@ def getAllShops():
     uid = get_uid_by_username(username)
     logger.info(f'user: {username} uid: {uid}, try to get all shops')
     shops = get_user_all_shops(uid)
-    shops = Shop.serialize_list(shops)
-    return jsonify(status=True, message='all shops', data=shops)
+    if shops is None:
+        return jsonify(status=False, message='user has no shops', data='')
+    else:
+        shops = Shop.serialize_list(shops)
+        return jsonify(status=True, message='all shops', data=shops)
     
 
 @shop_controller.route('/shop/<int:sid>', methods=['GET', 'PUT', 'DELETE'])
@@ -42,7 +45,10 @@ def shopHandler(sid):
     if request.method == 'GET':
         shop = get_shop_detail(sid)
         logger.info(f'try to get shop: id: {sid} info')
-        return jsonify(status=True, message='succeed', data=shop.serialize())
+        if shop is None:
+            return jsonify(status=False, message='shop not existed', data='')
+        else:
+            return jsonify(status=True, message='succeed', data=shop.serialize())
     # update shop info
     elif request.method == 'PUT':
         shopInfo = form2Dict(request.json, {'id': sid, 'name': '', 'description': ''})

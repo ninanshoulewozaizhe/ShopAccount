@@ -4,7 +4,7 @@ from app.database import db
 def create_product(product):
     with db.auto_commit_db():
         new_product = Product(name=product['name'], status=product['status'], description=product['description'],
-            shop=product['shop'], sid=product['sid'], tpye=product['type'], cost=product['cost'],
+            shop=product['shop'], sid=product['sid'], type=product['type'], cost=product['cost'],
             price=product['price'], img=product['img'])
         db.session.add(new_product)
         db.session.flush()
@@ -12,20 +12,20 @@ def create_product(product):
     return pid
 
 def get_preview_prodcuts_by_sid(sid, preview_count):
-    products = Product.query.filyer_by(sid=sid).slice(0,preview_count).all()
+    products = Product.query.filter_by(sid=sid).slice(0,preview_count).all()
     return products
 
 def get_product_detail_by_pid(pid):
-    product = Product.query.filyer_by(id=pid).first()
+    product = Product.query.filter_by(id=pid).first()
     return product
 
 
 def get_all_products_by_sid(sid):
-    products = Product.query.filyer_by(sid=sid).all()
+    products = Product.query.filter_by(sid=sid).all()
     return products
 
 def update_product_info(newInfo):
-    product = Product.query.filyer_by(id=newInfo['id']).first()
+    product = Product.query.filter_by(id=newInfo['id']).first()
     if product is not None:
         product.name = newInfo['name']
         product.description = newInfo['description']

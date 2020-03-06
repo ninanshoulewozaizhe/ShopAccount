@@ -11,8 +11,10 @@ from app.utils import form2Dict, getSalesCountfromSalesStr
 from app.log import logger
 from datetime import date
 import json
+from app.route.requestHandler import user_session_check
 
 product_controller = Blueprint('product_controller', __name__)
+product_controller.before_request(user_session_check)
 
 # 商品controller
 @product_controller.route('/product', methods=['POST'])
@@ -31,23 +33,36 @@ def getAllproducts():
     allProducts = []
     for shop in shops:
         products = get_all_products_by_sid(shop.id)
-        allProducts.extend(Product.serialize_list(products))
+        if products is not None:
+            allProducts.extend(Product.serialize_list(products))
     return jsonify(status=True, message='all products', data=allProducts)
 
 @product_controller.route('/products/<int:sid>', methods=['GET'])
 def getShopProducts(sid):
     products = get_all_products_by_sid(sid)
-    return jsonify(status=True, message='products in shop', data=Product.serialize_list(products))
+    if products is not None:
+        products = Product.serialize_list(products)
+        for product in products:
+            product['type'] = json.loads(json.dumps(product["type"]))
+        return jsonify(status=True, message='products in shop', data=products)
+    else:
+        return jsonify(status=False, message='shop has no products', data='')
+
 
 @product_controller.route('/product/<int:pid>', methods=['GET', 'PUT', 'DELETE'])
 def productHandler(pid):
     # get product info
     if request.method == 'GET':
-        product = get_product_detail_by_pid(pid).serialize()
-        return jsonify(status=True, message='succeed', data=product)
+        product = get_product_detail_by_pid(pid)
+        if product is not None:
+            product = product.serialize()
+            product["type"] = json.loads(json.dumps(product["type"]))
+            return jsonify(status=True, message='succeed', data=product)
+        else:
+            return jsonify(status=False, message='product does not exist', data='')
     # update product info
     elif request.method == 'PUT':
-        productInfo = form2Dict(request.form, {'id':'-1', 'name': '', 'status':'on-sale', \
+        productInfo = form2Dict(request.json, {'id':'-1', 'name': '', 'status':'on-sale', \
             'description': '', 'type':'', 'cost': 0, 'price': 0})
         status = update_product_info(productInfo)
         if status:
@@ -58,8 +73,8 @@ def productHandler(pid):
     else:
         delete_records_by_pid(pid)
         status, sid = delete_product_by_pid(pid)
-        increase_shop_product_amount(sid, -1)
         if status:
+            increase_shop_product_amount(sid, -1)
             return jsonify(status=True, message='succeed', data='')
         else:
             return jsonify(status=False, message='failed', data='') 
