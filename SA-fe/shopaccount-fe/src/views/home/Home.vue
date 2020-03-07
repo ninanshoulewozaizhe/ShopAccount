@@ -11,30 +11,26 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import productList from '@/components/home/productList.vue';
 import { IProductItem } from '@/typing/home/typings';
+import store from '@/store';
+import { LOAD_ALL_PRODUCTS, GET_ALL_PRODUCTS } from '@/store/modules/product/constants';
+
 
 @Component({
   name: 'home',
   components: {
     productList
+  },
+  async beforeRouteEnter(to: any, from: any, next: any) {
+    await store.dispatch(`product/${LOAD_ALL_PRODUCTS}`);
+    const products = store.getters[`product/${GET_ALL_PRODUCTS}`];
+    console.log(products);
+    next((vm: any) => {
+      vm.allProducts = [ ...products ];
+    });
   }
 })
 export default class Home extends Vue {
-  allProducts: IProductItem[] = [
-    {id: 1, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 2, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 3, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 4, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 5, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 6, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 7, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 8, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 9, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 10, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 11, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 12, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 13, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 14, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'}
-  ];
+  allProducts: IProductItem[] = [];
 
   showPageSize = 10;
 

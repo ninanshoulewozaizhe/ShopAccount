@@ -8,7 +8,7 @@ export type ActionObject<P = object> = { type: string } & {
 
 export interface IResponse<D, P = {}> {
   data?: D;
-  msg: string;
+  message: string;
   paramData: P;
   status: boolean;
   time: string;

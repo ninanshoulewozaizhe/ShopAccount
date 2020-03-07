@@ -93,12 +93,12 @@ export default {
       try {
         const { data } = await httpRequestSilence.get<
         IResponse<IUserInfo, {}>
-        >(`/user`);
+        >(`/login`);
         if (data.status) {
           commit(MODIFY_USER_PROFILE, data.data);
           return Promise.resolve('OK');
         } else {
-          return Promise.resolve(data.msg);
+          return Promise.resolve(data.message);
         }
       } catch (error) {
         return Promise.resolve(error);
@@ -116,6 +116,11 @@ export default {
       } catch (error) {
         return error.data;
       }
+    }
+  },
+  mutations: {
+    [MODIFY_USER_PROFILE](state, payload: IUserInfo) {
+      state.user = payload;
     }
   },
   getters: {
