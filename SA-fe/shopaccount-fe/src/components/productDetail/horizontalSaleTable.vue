@@ -18,7 +18,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import AppIcon from '../../../public/images/accountBook.jpg';
-import { IndexOJ } from './typings';
+import { IndexOJ } from '@/typing/productDetail/typings';
 import { IProductSalesItem } from '@/views/productDetail/typings';
 
 

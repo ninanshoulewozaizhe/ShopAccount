@@ -1,10 +1,18 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import user from './modules/user';
+import shop from './modules/shop';
+import product from './modules/product';
+// import salesStatus from './modules/salesStatus';
 import { ModuleState } from '@/typing/vuex/typings';
 
 Vue.use(Vuex);
 
-const modules = {};
+const modules = {
+  user,
+  shop,
+  product
+};
 
 const rootStore = new Vuex.Store<RootState>({
   modules,

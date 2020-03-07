@@ -19,7 +19,7 @@ sales_controller.before_request(user_session_check)
 # 销量记录controller
 @sales_controller.route('/createSalesRecord', methods=['POST'])
 def createSalesRecord():
-    recordInfo = form2Dict(request.form, {'pid': '', 'sid': '', 'date': date.today().isoformat(), 'sales': ''})
+    recordInfo = form2Dict(request.json, {'pid': '', 'sid': '', 'date': date.today().isoformat(), 'sales': ''})
     recordInfo['date'] = date.fromisoformat(recordInfo['date'])
     recordInfo['sales'] = json.dumps(ast.literal_eval(recordInfo['sales']))
     rid = create_new_record(recordInfo)

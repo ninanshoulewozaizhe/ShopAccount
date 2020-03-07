@@ -5,5 +5,4 @@ export interface IShopItem {
     description?: string;
     salesVolumes: number;
     productAmount: number;
-    preProductImgs?: any[];
 }

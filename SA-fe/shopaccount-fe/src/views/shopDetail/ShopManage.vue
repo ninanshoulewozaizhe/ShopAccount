@@ -144,7 +144,7 @@ export default class ShopManage extends Vue {
     id: 1,
     name: '好再来服饰',
     description: '春秋季新潮品',
-    salesVolume: 11,
+    salesVolumes: 11,
     productAmount: 11,
     img: AppIcon
   };

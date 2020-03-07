@@ -1,8 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 
 const instanceConfig = {
-  timeout: 5000,
-  baseURL: '/api'
+  timeout: 5000
 };
 
 export const httpRequest = axios.create(instanceConfig); // 请求对象，通常情况下使用此请求器

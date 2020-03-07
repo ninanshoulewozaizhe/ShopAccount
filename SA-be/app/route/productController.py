@@ -20,7 +20,7 @@ product_controller.before_request(user_session_check)
 # 商品controller
 @product_controller.route('/product', methods=['POST'])
 def createProduct():
-    productInfo = form2Dict(request.form, {'name': '', 'status':'on-sale', 'description': '', \
+    productInfo = form2Dict(request.json, {'name': '', 'status':'on-sale', 'description': '', \
         'img': '', 'sid': '-1', 'shop': '', 'type':'', 'salesVolumes': 0})
     productInfo['type'] = json.dumps(ast.literal_eval(productInfo['type']))
     pid = create_product(productInfo)

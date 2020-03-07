@@ -157,6 +157,8 @@ export default class ProductDetail extends Vue {
     description: '春秋季新潮品',
     salesVolumes: 11,
     img: AppIcon,
+    sid: 1,
+    shop: '好再来',
     type: {
       'S': 12,
       'M': 23,

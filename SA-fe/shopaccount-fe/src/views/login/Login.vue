@@ -9,7 +9,9 @@
         <el-input type="password" v-model="ruleForm.password" autocomplete="off"></el-input>
       </el-form-item>
     </el-form>
-    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="register_ruleForm" v-else>
+    <el-form :model="ruleForm" :rules="rules" 
+    ref="ruleForm" label-width="80px" 
+    class="register_ruleForm" v-else>
       <el-form-item label="账号" prop="username">
         <el-input v-model="ruleForm.username"></el-input>
       </el-form-item>
@@ -33,8 +35,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { SignUpForm, LoginForm } from '@/typing/login/typings';
-import { SIGNUP, LOGIN } from '../../store/modules/user/constants';
-import { LoginForm } from '../../typing/login/typings';
+import { SIGNUP, LOGIN, CHECK_USERNAME_EXIST, CHECK_PHONE_EXIST } from '../../store/modules/user/constants';
 
 @Component({
   name: 'login'
@@ -43,7 +44,6 @@ export default class Login extends Vue {
   ruleForm: SignUpForm = {
     username: '',
     password: '',
-    email: '',
     phone: '',
     confirmPd: ''
   };
@@ -62,6 +62,7 @@ export default class Login extends Vue {
     ]
   };
   loginState = true;
+  formState = false;
   registerText = '注册';
   submitText = '登录';
 
@@ -83,28 +84,37 @@ export default class Login extends Vue {
       if (result !== 'OK') {
         this.$notify.error({
           title: '登录失败',
-          message: result.msg
+          message: '请输入正确的账号或者密码'
         });
       } else {
         this.$notify({
             title: '登录成功',
-            message: result.msg,
+            message: '欢迎回来',
             type: 'success'
         });
         this.$router.push({ name: 'home' });
       }
     } else {
+      const ruleForm: any = this.$refs.ruleForm;
+      ruleForm.validate(this.formValidate);
+      if (!this.formState) {
+        this.$notify.error({
+          title: '注册失败',
+          message: '请填好注册信息'
+        });
+        return;
+      }
       const fields = Object.freeze({ ...this.ruleForm });
       const result = await this.$store.dispatch(`user/${SIGNUP}`, fields);
       if (result !== 'OK') {
         this.$notify.error({
           title: '注册失败',
-          message: result.msg
+          message: '请稍后重试'
         });
       } else {
         this.$notify({
             title: '注册成功',
-            message: result.msg,
+            message: '恭喜成为本站成员',
             type: 'success'
         });
         this.register();
@@ -123,17 +133,28 @@ export default class Login extends Vue {
     ruleForm.resetFields();
   }
 
-  checkUsername(rule: any, value: string, callback: any) {
+  async checkUsername(rule: any, value: string, callback: any) {
+    if (this.loginState) {
+      callback();
+    }
     if (!value) {
       callback(new Error('账号不可空'));
     } else if (/^[A-Za-z0-9]{7,18}$/.test(value)) {
-      callback();
+      const result = await this.$store.dispatch(`user/${CHECK_USERNAME_EXIST}`, value);
+      if (result === 'exist') {
+        callback();
+      } else {
+        callback(new Error('账号已存在，请更换账号'));
+      }
     } else {
       callback(new Error('请输入7-18位的数字或字母组合'));
     }
   }
 
   validatePass(rule: any, value: string, callback: any) {
+    if (this.loginState) {
+      callback();
+    }
     if (!value) {
       callback(new Error('密码不可空'));
     } else if (/^[A-Za-z0-9]{7,18}$/.test(value)) {
@@ -153,15 +174,25 @@ export default class Login extends Vue {
     }
   }
 
-  checkPhone(rule: any, value: string, callback: any) {
+  async checkPhone(rule: any, value: string, callback: any) {
     value = value.replace(/(^\+86|^86)/, '').replace(/-/g, '').trim();
     if (!value) {
       callback(new Error('请输入手机'));
     } else if (/^1[3-9]\d{9}$/.test(value)) {
-      callback();
+      const result = await this.$store.dispatch(`user/${CHECK_PHONE_EXIST}`, value);
+      if (result === 'exist') {
+        callback();
+      } else {
+        callback(new Error('该手机号已被使用，请更换手机号码'));
+      }
     } else {
       callback(new Error('请输入正确的手机号码'));
     }
+  }
+
+  formValidate(success: boolean) {
+    this.formState = success;
+    console.log(this.formState);
   }
 }
 

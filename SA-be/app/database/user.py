@@ -24,8 +24,16 @@ def create_user(userInfo):
 
 def username_exist(username):
     user = User.query.filter_by(username=username).first()
-    logger.info(f'exist: {user}')
     if user is not None:
+        logger.info(f'exist: {user}')
+        return True, user
+    else:
+        return False, None
+
+def phone_exist(phone):
+    user = User.query.filter_by(phone=phone).first()
+    if user is not None:
+        logger.info(f'exist: {user}')
         return True, user
     else:
         return False, None

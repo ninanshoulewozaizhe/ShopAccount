@@ -36,7 +36,7 @@
       :name="shop.name"
       :salesVolume="shop.salesVolume"
       :productAmount="shop.productAmount"
-      :preProductImgs="shop.preProductImgs"
+      :preProductImgs="preProductImgs"
       ></shop-card>
     </div>
     <el-pagination class="pagination" layout="prev, pager, next" 
@@ -60,12 +60,13 @@ import AppIcon from '../../../public/images/accountBook.jpg';
 })
 export default class Shops extends Vue {
   shopList: IShopItem[] = [
-    {id: 1, img: AppIcon, name: 'nice', salesVolume: 1, productAmount: 10, preProductImgs: [AppIcon, AppIcon, AppIcon]},
-    {id: 2, img: AppIcon, name: 'nice', salesVolume: 1, productAmount: 10, preProductImgs: [AppIcon, AppIcon, AppIcon]},
-    {id: 3, img: AppIcon, name: 'nice', salesVolume: 1, productAmount: 10, preProductImgs: [AppIcon, AppIcon, AppIcon]},
-    {id: 4, img: AppIcon, name: 'nice', salesVolume: 1, productAmount: 10, preProductImgs: [AppIcon, AppIcon, AppIcon]},
-    {id: 5, img: AppIcon, name: 'nice', salesVolume: 1, productAmount: 10, preProductImgs: [AppIcon, AppIcon, AppIcon]}
+    {id: 1, img: AppIcon, name: 'nice', salesVolumes: 1, productAmount: 10},
+    {id: 2, img: AppIcon, name: 'nice', salesVolumes: 1, productAmount: 10},
+    {id: 3, img: AppIcon, name: 'nice', salesVolumes: 1, productAmount: 10},
+    {id: 4, img: AppIcon, name: 'nice', salesVolumes: 1, productAmount: 10},
+    {id: 5, img: AppIcon, name: 'nice', salesVolumes: 1, productAmount: 10}
   ];
+  preProductImgs: any[] = [AppIcon, AppIcon, AppIcon];
   showPageSize = 3;
   showshops: IShopItem[] = [];
   addShopDialog = false;
@@ -73,7 +74,7 @@ export default class Shops extends Vue {
     id: -1,
     name: '',
     description: '',
-    salesVolume: 0,
+    salesVolumes: 0,
     productAmount: 0,
     img: AppIcon
   };

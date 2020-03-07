@@ -60,28 +60,28 @@ import productCard from '@/components/home/productCard.vue';
 })
 export default class ShopDetail extends Vue {
   allTableData: IProductItem[] = [
-    {id: 1, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
-    {id: 2, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
-    {id: 3, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
-    {id: 4, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
-    {id: 5, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
-    {id: 6, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
-    {id: 7, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
-    {id: 8, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
-    {id: 9, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
-    {id: 10, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
-    {id: 11, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
-    {id: 12, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
-    {id: 13, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
-    {id: 14, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'}
+    {id: 1, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
+    {id: 2, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
+    {id: 3, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
+    {id: 4, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
+    {id: 5, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
+    {id: 6, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
+    {id: 7, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
+    {id: 8, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
+    {id: 9, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
+    {id: 10, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
+    {id: 11, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
+    {id: 12, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
+    {id: 13, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
+    {id: 14, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'}
     ];
   showtableSize = 4;
   showTable: IProductItem[]  = [];
   showProducts: IProductItem[] = [
-    {id: 1, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
-    {id: 13, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
-    {id: 2, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'},
-    {id: 3, name: '韩版卫衣', salesVolume: 11, sid: 1, shop: '好再来服饰'}
+    {id: 1, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
+    {id: 13, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
+    {id: 2, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
+    {id: 3, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'}
     ];
 
   chartData = {
@@ -140,7 +140,7 @@ export default class ShopDetail extends Vue {
 
   get productSalesVolumeToday() {
     return this.allTableData.reduce((pre, cur) => {
-      return pre + cur.salesVolume;
+      return pre + cur.salesVolumes;
     }, 0);
   }
 

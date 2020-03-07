@@ -19,7 +19,7 @@ shop_controller.before_request(user_session_check)
 def createShop():
     username = session.get('username')
     uid = get_uid_by_username(username)
-    shopInfo = form2Dict(request.form, {'name': '', 'description': '', 'img': '', 'uid': uid})
+    shopInfo = form2Dict(request.json, {'name': '', 'description': '', 'img': '', 'uid': uid})
     logger.info(f'user: {username} try to create shop:{shopInfo}')
     sid = create_shop(shopInfo)
     logger.info(f'shop-id: {sid} created')

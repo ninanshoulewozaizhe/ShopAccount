@@ -19,8 +19,6 @@ export interface IProductDetailItem {
     sid: number;
     shop: string;
     type: IkindToStocks;
-    cost?: number;
-    price?: number;
 }
 
 export interface IProductSalesItem {

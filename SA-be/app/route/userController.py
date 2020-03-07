@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, session
-from app.database.user import create_user, username_exist, \
+from app.database.user import create_user, username_exist, phone_exist, \
     user_verification, update_user_info, get_uid_by_username
 from app.utils import form2Dict, getSalesCountfromSalesStr
 from app.log import logger
@@ -22,8 +22,8 @@ def login():
         else:
             return jsonify(status=False, message='no session', data='')
     else:
-        username = request.form.get('username', '')
-        password = request.form.get('password', '')
+        username = request.json.get('username', '')
+        password = request.json.get('password', '')
         print(username, password)
         if username == '' or password == '':
             print('error')
@@ -51,12 +51,24 @@ def register():
             logger.info('username available')
             return jsonify(status=True, message="username available", data='')
     else:
-        userInfo = form2Dict(request.form, {'username': '', 'password': '', 'phone': ''})
+        userInfo = form2Dict(request.json, {'username': '', 'password': '', 'phone': ''})
         status, uid = create_user(userInfo)
         if status:
             return jsonify(status=True, message="succeed", data={'uid': uid})
         else:
             return jsonify(status=False, message="failed", data='')
+
+
+@user_controller.route('/checkPhone', methods=['GET'])
+def checkPhone():
+    phone = request.args.get('phone')
+    exist = phone_exist(phone)
+    if exist[0]:
+        logger.warning(f'register failed, phone:{phone} has existed')
+        return jsonify(status=False, message="phone has existed", data='')
+    else:
+        logger.info('phone available')
+        return jsonify(status=True, message="phone available", data='')
 
 @user_controller.route('/logout', methods=['PUT'])
 def logout():
