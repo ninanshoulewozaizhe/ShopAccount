@@ -8,6 +8,8 @@ from app.route.userController import user_controller
 from app.route.salesController import sales_controller
 import os
 
+UPLOAD_PATH = 'static/images'
+
 # 支持跨域
 def after_request(resp):
     resp.headers['Access-Control-Allow-Origin'] = '*'
@@ -20,7 +22,7 @@ def create_app():
     # app 配置
     app.after_request(after_request)
     app.config['SECRET_KEY'] = os.urandom(24)
-
+    app.config['UPLOAD_PATH'] = UPLOAD_PATH
     # 蓝图挂载
     app.register_blueprint(product_controller)
     app.register_blueprint(shop_controller)

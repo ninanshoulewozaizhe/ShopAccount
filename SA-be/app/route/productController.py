@@ -7,7 +7,7 @@ from app.database.product import create_product, get_preview_prodcuts_by_sid, \
     delete_products_by_sid, get_product_detail_by_pid
 from app.database.shop import increase_shop_product_amount, get_user_all_shops
 from app.database.salesVolumes import delete_records_by_pid
-from app.utils import form2Dict, getSalesCountfromSalesStr
+from app.utils import form2Dict, getSalesCountfromSalesStr, imgSave
 from app.log import logger
 from datetime import date
 import json

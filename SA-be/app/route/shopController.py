@@ -6,7 +6,7 @@ from app.database.shop import create_shop, get_user_all_shops, get_shop_detail, 
     update_shop_info, update_shop_img, delete_shop, increase_shop_sales, \
     increase_shop_product_amount
 from app.database.salesVolumes import delete_records_by_sid
-from app.utils import form2Dict, getSalesCountfromSalesStr
+from app.utils import form2Dict, getSalesCountfromSalesStr, imgSave
 from app.log import logger
 from datetime import date
 import json

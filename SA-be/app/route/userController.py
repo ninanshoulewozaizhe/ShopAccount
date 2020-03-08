@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, session
 from app.database.user import create_user, username_exist, phone_exist, \
     user_verification, update_user_info, get_uid_by_username
-from app.utils import form2Dict, getSalesCountfromSalesStr
+from app.utils import form2Dict, getSalesCountfromSalesStr, imgSave
 from app.log import logger
 from datetime import date
 import json
@@ -69,6 +69,16 @@ def checkPhone():
     else:
         logger.info('phone available')
         return jsonify(status=True, message="phone available", data='')
+
+@user_controller.route('/userImg', methods=['POST', 'PUT'])
+def uploadUserImg():
+    img = request.files['file']
+    if img is None:
+        return jsonify(status=False, message="img not existed", data='')
+    username = session.get('username')
+    imgName = f'{username}.png'
+    imgSave(img, imgName)
+    return jsonify(status=True, message="img upload succeed", data=imgName)
 
 @user_controller.route('/logout', methods=['PUT'])
 def logout():
