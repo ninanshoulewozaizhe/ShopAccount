@@ -3,7 +3,8 @@
       <product-list 
       :allProducts="allProducts"
       :showPageSize="showPageSize"
-      ></product-list>        
+      ></product-list>
+      <div v-if="allProducts.length == 0">暂无店铺商品，请前往店铺列表选择店铺添加商品哦</div>        
     </div>
 </template>
 

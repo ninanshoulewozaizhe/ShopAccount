@@ -20,11 +20,11 @@ export default {
         const { data } = await httpRequestSilence.get<IResponse<IProductItem[]> >(
           `/products`
         );
-        if (data.status || data.msg === 'OK') {
+        if (data.status) {
           commit(MODIFY_ALL_PRODUCTS, data.data);
           return Promise.resolve('OK');
         } else {
-          return Promise.resolve(data.msg);
+          return Promise.resolve(data.message);
         }
       } catch (error) {
         return Promise.resolve(error);

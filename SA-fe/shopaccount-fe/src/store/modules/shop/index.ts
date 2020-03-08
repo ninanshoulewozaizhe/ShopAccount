@@ -41,7 +41,7 @@ export default {
           commit(MODIFY_ALL_SHOPS, data.data);
           return Promise.resolve('OK');
         } else {
-          return Promise.resolve(data.msg);
+          return Promise.resolve(data.message);
         }
       } catch (error) {
         return Promise.resolve(error);

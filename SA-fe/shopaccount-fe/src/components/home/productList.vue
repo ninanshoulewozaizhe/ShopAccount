@@ -7,11 +7,11 @@
           :shop="product.shop" 
           :salesVolume="product.salesVolumes"></product-card>
       </div>
-      
-    <el-pagination class="pagination" layout="prev, pager, next" 
-    :total="allProducts.length"
-    :page-size="showPageSize"
-    @current-change="pageChange"></el-pagination>
+      <el-pagination class="pagination" layout="prev, pager, next" 
+      :total="allProducts.length"
+      :page-size="showPageSize"
+      @current-change="pageChange"
+      v-if="allProducts.length != 0"></el-pagination>
     </div>
   </div>
 </template>
