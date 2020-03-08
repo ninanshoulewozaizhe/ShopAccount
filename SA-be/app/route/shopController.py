@@ -36,6 +36,12 @@ def getAllShops():
         return jsonify(status=False, message='user has no shops', data='')
     else:
         shops = Shop.serialize_list(shops)
+        for shop in shops:
+            preProducts = get_preview_prodcuts_by_sid(shop.id, 4)
+            preProductImgs = []
+            for product in preProducts:
+                preProductImgs.append(product.img)
+            shop['preProductImg'] = preProductImgs
         return jsonify(status=True, message='all shops', data=shops)
     
 
@@ -48,7 +54,13 @@ def shopHandler(sid):
         if shop is None:
             return jsonify(status=False, message='shop not existed', data='')
         else:
-            return jsonify(status=True, message='succeed', data=shop.serialize())
+            shop = shop.serialize()
+            preProducts = get_preview_prodcuts_by_sid(shop.id, 4)
+            preProductImgs = []
+            for product in preProducts:
+                preProductImgs.append(product.img)
+            shop['preProductImg'] = preProductImgs
+            return jsonify(status=True, message='succeed', data=shop)
     # update shop info
     elif request.method == 'PUT':
         shopInfo = form2Dict(request.json, {'id': sid, 'name': '', 'description': ''})

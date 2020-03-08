@@ -142,6 +142,7 @@ export default class ShopManage extends Vue {
   showSalesDialog = false;
   shop: IShopItem = {
     id: 1,
+    uid: 1,
     name: '好再来服饰',
     description: '春秋季新潮品',
     salesVolumes: 11,

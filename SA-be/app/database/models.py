@@ -15,6 +15,7 @@ class User(db.Model, Serializer):
     username = db.Column(db.String(32), nullable=False)
     password = db.Column(db.String(64), nullable=False)
     phone = db.Column(db.String(20))
+    img = db.Column(db.String(128))
 
     def serialize(self):
         d = Serializer.serialize(self)

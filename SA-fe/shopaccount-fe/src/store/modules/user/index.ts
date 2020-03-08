@@ -9,7 +9,8 @@ import {
   IS_LOGIN,
   LOGIN,
   LOGOUT,
-  SIGNUP
+  SIGNUP,
+  UID
 } from './constants';
 import { httpRequestSilence } from '@/utils/httpRequest';
 import { IResponse } from '@/typing/vuex/typings';
@@ -129,6 +130,9 @@ export default {
     },
     [IS_LOGIN](state): boolean {
       return state.user !== null;
+    },
+    [UID](state): number | null {
+      return state.user && state.user.id;
     }
   }
 } as Module<State, any>;

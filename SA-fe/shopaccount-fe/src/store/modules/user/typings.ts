@@ -3,7 +3,7 @@ export interface State {
 }
 
 export interface IUserInfo {
-    uid: number;
+    id: number;
     username: string;
     email: string;
 }

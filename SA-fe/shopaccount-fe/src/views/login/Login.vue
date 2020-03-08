@@ -136,6 +136,7 @@ export default class Login extends Vue {
   async checkUsername(rule: any, value: string, callback: any) {
     if (this.loginState) {
       callback();
+      return;
     }
     if (!value) {
       callback(new Error('账号不可空'));
@@ -154,6 +155,7 @@ export default class Login extends Vue {
   validatePass(rule: any, value: string, callback: any) {
     if (this.loginState) {
       callback();
+      return;
     }
     if (!value) {
       callback(new Error('密码不可空'));

@@ -10,5 +10,6 @@ export const LOGOUT = 'LOGOUT';
 export const SIGNUP = 'SIGNUP';
 
 // getters
+export const UID = 'UID';
 export const CURRENT_USER_INFO = 'CURRENT_USER_INFO';
 export const IS_LOGIN = 'IS_LOGIN';

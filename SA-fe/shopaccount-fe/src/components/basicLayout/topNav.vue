@@ -16,11 +16,11 @@
         <el-menu-item index="/salesStatus">销售情况</el-menu-item>
       </el-menu>
       <div class="user_container">
-        <el-dropdown>
+        <el-dropdown @command="dropdownMenuHandler">
           <img class="user_avatar" :src="appIcon" />
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>个人中心</el-dropdown-item>
-            <el-dropdown-item>退出</el-dropdown-item>
+          <el-dropdown-menu  slot="dropdown">
+            <el-dropdown-item command="profile">个人中心</el-dropdown-item>
+            <el-dropdown-item command="logout">退出</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
@@ -30,12 +30,23 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import AppIcon from '../../../public/images/accountBook.jpg';
+import { LOGOUT } from '@/store/modules/user/constants';
 
 @Component({
   name: 'topNav'
 })
 export default class TopNav extends Vue {
   appIcon = AppIcon;
+
+  async dropdownMenuHandler(command: string) {
+    console.log('dropdownMenuHandler');
+    if (command === 'logout') {
+      console.log('try to loggout');
+      const result = await this.$store.dispatch(`user/${LOGOUT}`);
+      console.log(result);
+      this.$router.push({name: 'login'});
+    }
+  }
 }
 </script>
 

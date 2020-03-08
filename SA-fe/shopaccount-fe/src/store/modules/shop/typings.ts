@@ -1,5 +1,6 @@
-import { IShopItem } from '@/typing/shops/typings';
+import { IShopItem, IShopPreItem } from '@/typing/shops/typings';
 
 export interface State {
-   allShops: IShopItem[];
+   allShops: IShopPreItem[];
+   curShop: IShopPreItem | null;
 }

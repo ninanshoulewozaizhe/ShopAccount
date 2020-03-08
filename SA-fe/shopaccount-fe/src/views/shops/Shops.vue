@@ -25,7 +25,7 @@
             （店内商品在店铺管理中添加）
           </div>
           <div slot="footer" class="dialog-footer">
-            <el-button @click="addShopDialog = false">取 消</el-button>
+            <el-button @click="cancelAddShop">取 消</el-button>
             <el-button type="primary" @click="addShopDialog = false">确 定</el-button>
           </div>
         </el-dialog>
@@ -49,29 +49,39 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import shopCard from '@/components/shops/shopCard.vue';
-import { IShopItem } from '@/typing/shops/typings';
+import { IShopPreItem, IShopItem } from '@/typing/shops/typings';
 import AppIcon from '../../../public/images/accountBook.jpg';
+import store from '@/store';
+import { LOAD_ALL_SHOPS, GET_ALL_SHOPS, ADD_NEW_SHOP } from '../../store/modules/shop/constants';
+import { UID } from '@/store/modules/user/constants';
 
 @Component({
   name: 'shops',
   components: {
       shopCard
+  },
+  async beforeRouteEnter(to: any, from: any, next: any) {
+    await store.dispatch(`shop/${LOAD_ALL_SHOPS}`);
+    const shops = store.getters[`shop/${GET_ALL_SHOPS}`];
+    const USERID = store.getters[`user/${UID}`];
+    console.log(shops);
+    console.log(USERID);
+    next((vm: any) => {
+      vm.shopList = [ ...shops ];
+      vm.USERID = USERID;
+    });
   }
 })
 export default class Shops extends Vue {
-  shopList: IShopItem[] = [
-    {id: 1, img: AppIcon, name: 'nice', salesVolumes: 1, productAmount: 10},
-    {id: 2, img: AppIcon, name: 'nice', salesVolumes: 1, productAmount: 10},
-    {id: 3, img: AppIcon, name: 'nice', salesVolumes: 1, productAmount: 10},
-    {id: 4, img: AppIcon, name: 'nice', salesVolumes: 1, productAmount: 10},
-    {id: 5, img: AppIcon, name: 'nice', salesVolumes: 1, productAmount: 10}
-  ];
+  shopList: IShopPreItem[] = [];
+  USERID = -1;
   preProductImgs: any[] = [AppIcon, AppIcon, AppIcon];
   showPageSize = 3;
-  showshops: IShopItem[] = [];
+  showshops: IShopPreItem[] = [];
   addShopDialog = false;
   newShop: IShopItem = {
     id: -1,
+    uid: this.USERID,
     name: '',
     description: '',
     salesVolumes: 0,
@@ -103,6 +113,43 @@ export default class Shops extends Vue {
         sid: String(sid)
       }
     });
+  }
+
+  newShopInfoClear() {
+    this.newShop = {
+      id: -1,
+      uid: this.USERID,
+      name: '',
+      description: '',
+      salesVolumes: 0,
+      productAmount: 0,
+      img: AppIcon
+    };
+  }
+
+  cancelAddShop() {
+    this.newShopInfoClear();
+    this.addShopDialog = false;
+  }
+
+  async submitAddShop() {
+    const fields = Object.freeze({ ...this.newShop });
+    const result = await this.$store.dispatch(`shop/${ADD_NEW_SHOP}`, fields);
+    if (result.status) {
+      this.$notify({
+        title: '创建成功',
+        message: '新店铺已创建',
+        type: 'success'
+      });
+      this.newShop.id = +result.sid;
+      this.shopList.push({ ...this.newShop });
+      this.newShopInfoClear();
+    } else {
+      this.$notify.error({
+          title: '创建失败',
+          message: '请稍后再试'
+        });
+    }
   }
 }
 </script>
