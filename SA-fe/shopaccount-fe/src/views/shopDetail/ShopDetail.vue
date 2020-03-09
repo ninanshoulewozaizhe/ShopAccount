@@ -49,17 +49,29 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import AppIcon from '../../../public/images/accountBook.jpg';
-import { IProductItem } from '@/typing/home/typings';
+import { IProductDetailItem } from '@/typing/home/typings';
+import { IProductDetailItem } from '@/typing/productDetail/typings';
 import productCard from '@/components/home/productCard.vue';
+import store from '@/store';
+import { LOAD_CUR_SHOP, GET_CUR_SHOP, ADD_NEW_SHOP } from '@/store/modules/shop/constants';
+import { LOAD_CUR_SHOP_PRE_PRODUCTS, GET_CUR_SHOP_PRODUCTS } from '@/store/modules/product/constants';
 
 @Component({
   name: 'shopDetail',
   components: {
     productCard
   }
+  async beforeRouteEnter(to: any, from: any, next: any) {
+    const sid = to.params.sid;
+    await store.dispatch(`product/${LOAD_CUR_SHOP_PRE_PRODUCTS}`, sid);
+    const products = store.getters[`product/${GET_CUR_SHOP_PRODUCTS}`];
+    next((vm: any) => {
+      vm.showProducts = [ ...products ];
+    });
+  }
 })
 export default class ShopDetail extends Vue {
-  allTableData: IProductItem[] = [
+  allTableData: IProductDetailItem[] = [
     {id: 1, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
     {id: 2, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
     {id: 3, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
@@ -76,13 +88,8 @@ export default class ShopDetail extends Vue {
     {id: 14, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'}
     ];
   showtableSize = 4;
-  showTable: IProductItem[]  = [];
-  showProducts: IProductItem[] = [
-    {id: 1, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 13, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 2, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 3, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'}
-    ];
+  showTable: IProductDetailItem[]  = [];
+  showProducts: IProductDetailItem[] = [];
 
   chartData = {
     columns: ['日期', '销量'],

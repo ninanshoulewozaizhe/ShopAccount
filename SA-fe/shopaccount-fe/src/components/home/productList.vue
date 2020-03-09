@@ -18,10 +18,9 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { IProductItem } from '@/typing/home/typings';
 import AppIcon from '../../../public/images/accountBook.jpg';
 import productCard from './productCard.vue';
-
+import { IProductDetailItem } from '@/typing/productDetail/typings';
 @Component({
   name: 'productList',
   components: {
@@ -30,10 +29,10 @@ import productCard from './productCard.vue';
 })
 export default class ProductList extends Vue {
 
-@Prop() readonly allProducts!: IProductItem[];
+@Prop() readonly allProducts!: IProductDetailItem[];
 @Prop() readonly showPageSize!: number;
 
-  showProducts: IProductItem[] = [];
+  showProducts: IProductDetailItem[] = [];
 
   mounted() {
     this.showProductsInit();

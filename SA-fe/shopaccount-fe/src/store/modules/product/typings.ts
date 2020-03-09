@@ -1,5 +1,6 @@
-import { IProductItem } from '@/typing/home/typings';
+import { IProductDetailItem } from '@/typing/productDetail/typings';
 
 export interface State {
-   allProducts: IProductItem[];
+   allProducts: IProductDetailItem[];
+   curShopProducts: IProductDetailItem[];
 }

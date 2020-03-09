@@ -24,6 +24,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { IProductItem } from '@/typing/home/typings';
+import { IProductDetailItem } from '@/typing/productDetail/typings';
 
 @Component({
   name: 'salesStatus'

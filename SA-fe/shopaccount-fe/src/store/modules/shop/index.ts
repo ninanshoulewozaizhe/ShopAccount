@@ -14,7 +14,6 @@ import {
 import { httpRequestSilence } from '@/utils/httpRequest';
 import { IResponse } from '@/typing/vuex/typings';
 import { IShopItem, IShopPreItem } from '@/typing/shops/typings';
-import { IProductItem } from '@/typing/home/typings';
 
 
 export default {
@@ -41,7 +40,7 @@ export default {
     },
     async [LOAD_CUR_SHOP]({ commit }, payload: number): Promise<string> {
       try {
-        const { data } = await httpRequestSilence.get<IResponse<IShopItem[]> >(
+        const { data } = await httpRequestSilence.get<IResponse<IShopItem> >(
           `/shop/${payload}`);
         if (data.status) {
           commit(MODIFY_CUR_SHOP, data.data);
@@ -55,10 +54,10 @@ export default {
     },
     async [ADD_NEW_SHOP]({ commit }, payload: IShopItem): Promise<any> {
       try {
-        const { data } = await httpRequestSilence.post<IResponse<IShopItem[]> >(
+        const { data } = await httpRequestSilence.post<IResponse<any> >(
           `/createShop`, payload);
         if (data.status) {
-          return Promise.resolve({status: true, sid: data.data});
+          return Promise.resolve({status: true, sid: data.data.sid});
         } else {
           return Promise.resolve(data.message);
         }
@@ -68,7 +67,7 @@ export default {
     },
     async [UPDATE_SHOP]({ commit }, payload: IShopItem): Promise<string> {
       try {
-        const { data } = await httpRequestSilence.put<IResponse<IShopItem[]> >(
+        const { data } = await httpRequestSilence.put<IResponse<string> >(
           `/shop/${payload.id}`, payload);
         if (data.status) {
           return Promise.resolve('OK');
@@ -81,7 +80,7 @@ export default {
     },
     async [DELETE_SHOP]({ commit }, payload: IShopItem): Promise<string> {
       try {
-        const { data } = await httpRequestSilence.delete<IResponse<IShopItem[]> >(
+        const { data } = await httpRequestSilence.delete<IResponse<string> >(
           `/shops/${payload.id}`);
         if (data.status) {
           return Promise.resolve('OK');

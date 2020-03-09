@@ -16,7 +16,15 @@
             <el-button @click="showSalesDialog = true">更新商品销量</el-button>
             <el-dialog class="p_info_dialog" title="更新信息" :visible.sync="showUpdateDialog">
               <div class="p_info_dialog_container">
-                <img class="p_info_img" :src="modifyProduct.img" alt="p_img">
+                <el-upload
+                  class="img-uploader"
+                  action="/shopImg"
+                  :show-file-list="false"
+                  :on-success="handleImgSuccess"
+                  :before-upload="beforeImgUpload">
+                  <img v-if="modifyProduct.img" :src="modifyProduct.img" class="p_info_img">
+                  <i v-else class="el-icon-plus img-uploader-icon"></i>
+                </el-upload>
                 <el-form>
                   <el-form-item label="商品名称">
                     <el-input class="p_info_name_input"
@@ -286,6 +294,25 @@ export default class ProductDetail extends Vue {
       }
     }
   }
+
+  beforeImgUpload(file: any) {
+    const isJPGorPNG = file.type === 'image/jpeg' || file.type === 'image/png';
+    const isLt10M = file.size / 1024 / 1024 < 10;
+    if (!isJPGorPNG) {
+      this.$message.error('请上传图片类型的文件');
+      return false;
+    }
+    if (!isLt10M) {
+      this.$message.error('上传头像图片大小不能超过 10MB');
+      return false;
+    }
+    return isJPGorPNG && isLt10M;
+  }
+
+  async avatarUploadSuccess(res) {
+    this.modifyProduct.img = `/static/images/${res.data}?t=${Math.random()}`;
+    this.$message.success('图片上传成功');
+  }
 }
 </script>
 
@@ -329,10 +356,32 @@ export default class ProductDetail extends Vue {
         align-items: center;
         flex-direction: column;
         
+        .img-uploader {
+          width: 178px;
+          height: 178px;
+          border: 1px dashed #d9d9d9;
+          border-radius: 6px;
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;    
+        }
+
+        .img-uploader:hover {
+          border-color: #409EFF;
+        }
+
+        .img-uploader-icon {
+          font-size: 28px;
+          color: #8c939d;
+          width: 178px;
+          height: 178px;
+          line-height: 178px;
+          text-align: center;
+        }
         .p_info_img {
-          width: 200px;
-          height: 250px;
-          margin-bottom: 15px;
+          width: 178px;
+          height: 178px;
+          display: block;
         }
 
         .p_info_name_input, .p_info_desc_input {

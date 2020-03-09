@@ -5,7 +5,15 @@
       <el-button class="add_new_shop" @click="addShopDialog = true">添加店铺</el-button>
         <el-dialog class="p_info_dialog" title="添加新店铺" :visible.sync="addShopDialog">
           <div class="p_info_dialog_container">
-            <img class="p_info_img" :src="newShop.img" alt="p_img">
+            <el-upload
+              class="avatar-uploader"
+              action="/shopImg"
+              :show-file-list="false"
+              :on-success="avatarUploadSuccess"
+              :before-upload="beforeAvatarUpload">
+              <img v-if="newShop.img" :src=" `/getImg?f=${newShop.img}&t=${Math.random()}`" class="avatar">
+              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            </el-upload>
             <el-form>
               <el-form-item label="店铺名称">
                 <el-input class="p_info_name_input"
@@ -26,7 +34,7 @@
           </div>
           <div slot="footer" class="dialog-footer">
             <el-button @click="cancelAddShop">取 消</el-button>
-            <el-button type="primary" @click="addShopDialog = false">确 定</el-button>
+            <el-button type="primary" @click="submitAddShop">确 定</el-button>
           </div>
         </el-dialog>
     </div>
@@ -36,13 +44,15 @@
       :name="shop.name"
       :salesVolume="shop.salesVolume"
       :productAmount="shop.productAmount"
-      :preProductImgs="preProductImgs"
+      :preProductImgs="shop.preProductImgs"
       ></shop-card>
     </div>
     <el-pagination class="pagination" layout="prev, pager, next" 
       :total="shopList.length"
       :page-size="showPageSize"
-      @current-change="pageChange"></el-pagination>
+      :current-page.sync="curPage"
+      @current-change="pageChange"
+      v-if="showshops.length"></el-pagination>
   </div>
 </template>
 
@@ -54,6 +64,7 @@ import AppIcon from '../../../public/images/accountBook.jpg';
 import store from '@/store';
 import { LOAD_ALL_SHOPS, GET_ALL_SHOPS, ADD_NEW_SHOP } from '../../store/modules/shop/constants';
 import { UID } from '@/store/modules/user/constants';
+import { IShopPreItem } from '../../typing/shops/typings';
 
 @Component({
   name: 'shops',
@@ -64,19 +75,19 @@ import { UID } from '@/store/modules/user/constants';
     await store.dispatch(`shop/${LOAD_ALL_SHOPS}`);
     const shops = store.getters[`shop/${GET_ALL_SHOPS}`];
     const USERID = store.getters[`user/${UID}`];
-    console.log(shops);
-    console.log(USERID);
     next((vm: any) => {
       vm.shopList = [ ...shops ];
       vm.USERID = USERID;
+      vm.newShop.uid = USERID;
+      vm.showShopsInit();
     });
   }
 })
 export default class Shops extends Vue {
   shopList: IShopPreItem[] = [];
   USERID = -1;
-  preProductImgs: any[] = [AppIcon, AppIcon, AppIcon];
   showPageSize = 3;
+  curPage = 1;
   showshops: IShopPreItem[] = [];
   addShopDialog = false;
   newShop: IShopItem = {
@@ -86,11 +97,8 @@ export default class Shops extends Vue {
     description: '',
     salesVolumes: 0,
     productAmount: 0,
-    img: AppIcon
+    img: ''
   };
-  mounted() {
-    this.showShopsInit();
-  }
 
   showShopsInit() {
     for (let i = 0; i < this.showPageSize && i < this.shopList.length; ++i) {
@@ -101,6 +109,15 @@ export default class Shops extends Vue {
   pageChange(curPage: number) {
     this.showshops = [];
     for (let i = this.showPageSize * (curPage - 1), time = 0;
+    time < this.showPageSize && i < this.shopList.length; ++i, ++time) {
+      this.showshops.push(this.shopList[i]);
+    }
+  }
+
+  updateShopList(newShopInfo: IShopPreItem) {
+    this.shopList.push(newShopInfo);
+    this.showshops = [];
+    for (let i = this.showPageSize * (this.curPage - 1), time = 0;
     time < this.showPageSize && i < this.shopList.length; ++i, ++time) {
       this.showshops.push(this.shopList[i]);
     }
@@ -123,7 +140,7 @@ export default class Shops extends Vue {
       description: '',
       salesVolumes: 0,
       productAmount: 0,
-      img: AppIcon
+      img: ''
     };
   }
 
@@ -134,15 +151,20 @@ export default class Shops extends Vue {
 
   async submitAddShop() {
     const fields = Object.freeze({ ...this.newShop });
+    console.log(fields);
     const result = await this.$store.dispatch(`shop/${ADD_NEW_SHOP}`, fields);
+    this.addShopDialog = false;
     if (result.status) {
       this.$notify({
         title: '创建成功',
         message: '新店铺已创建',
         type: 'success'
       });
+      console.log(result);
       this.newShop.id = +result.sid;
-      this.shopList.push({ ...this.newShop });
+      console.log(this.newShop);
+      this.updateShopList({ ...this.newShop });
+      console.log(this.shopList);
       this.newShopInfoClear();
     } else {
       this.$notify.error({
@@ -150,6 +172,27 @@ export default class Shops extends Vue {
           message: '请稍后再试'
         });
     }
+  }
+
+  beforeAvatarUpload(file: any) {
+    const isJPGorPNG = file.type === 'image/jpeg' || file.type === 'image/png';
+    const isLt10M = file.size / 1024 / 1024 < 10;
+    if (!isJPGorPNG) {
+      this.$message.error('请上传图片类型的文件');
+      return false;
+    }
+    if (!isLt10M) {
+      this.$message.error('上传头像图片大小不能超过 10MB');
+      return false;
+    }
+    return isJPGorPNG && isLt10M;
+  }
+
+  async avatarUploadSuccess(res) {
+    console.log(res);
+    this.newShop.img = res.data;
+    console.log(this.newShop.img);
+    this.$message.success('图片上传成功');
   }
 }
 </script>
@@ -177,11 +220,33 @@ export default class Shops extends Vue {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  
-  .p_info_img {
-    width: 200px;
-    height: 250px;
-    margin-bottom: 15px;
+
+  .avatar-uploader {
+    width: 178px;
+    height: 178px;
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;    
+  }
+
+  .avatar-uploader:hover {
+    border-color: #409EFF;
+  }
+
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
   }
 
   .p_info_name_input, .p_info_desc_input {

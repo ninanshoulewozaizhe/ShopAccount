@@ -39,10 +39,10 @@ def getAllShops():
     else:
         shops = Shop.serialize_list(shops)
         for shop in shops:
-            preProducts = get_preview_prodcuts_by_sid(shop.id, 4)
+            preProducts = get_preview_prodcuts_by_sid(shop['id'], 4)
             preProductImgs = []
             for product in preProducts:
-                preProductImgs.append(product.img)
+                preProductImgs.append(product['img'])
             shop['preProductImg'] = preProductImgs
         return jsonify(status=True, message='all shops', data=shops)
     
@@ -57,10 +57,10 @@ def shopHandler(sid):
             return jsonify(status=False, message='shop not existed', data='')
         else:
             shop = shop.serialize()
-            preProducts = get_preview_prodcuts_by_sid(shop.id, 4)
+            preProducts = get_preview_prodcuts_by_sid(shop['id'], 4)
             preProductImgs = []
             for product in preProducts:
-                preProductImgs.append(product.img)
+                preProductImgs.append(product['img'])
             shop['preProductImg'] = preProductImgs
             return jsonify(status=True, message='succeed', data=shop)
     # update shop info
@@ -103,7 +103,7 @@ def updateShopImg(sid):
     imgName = imgSave(img, imgPrefix)
     shop = get_shop_detail(sid)
     originImg = shop['img']
-    originImgPath = os.path.join(app.instance_path, 'app/static/images', originImg)
+    originImgPath = os.path.join(app.instance_path, r'app\static\images', originImg)
     os.remove(originImgPath)
     update_shop_img(sid, imgName)
     return jsonify(status=True, message="img upload succeed", data=imgName)

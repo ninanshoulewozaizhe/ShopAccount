@@ -11,7 +11,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import productList from '@/components/home/productList.vue';
-import { IProductItem } from '@/typing/home/typings';
+import { IProductDetailItem } from '@/typing/productDetail/typings';
 import store from '@/store';
 import { LOAD_ALL_PRODUCTS, GET_ALL_PRODUCTS } from '@/store/modules/product/constants';
 
@@ -31,7 +31,7 @@ import { LOAD_ALL_PRODUCTS, GET_ALL_PRODUCTS } from '@/store/modules/product/con
   }
 })
 export default class Home extends Vue {
-  allProducts: IProductItem[] = [];
+  allProducts: IProductDetailItem[] = [];
 
   showPageSize = 10;
 

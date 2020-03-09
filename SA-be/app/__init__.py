@@ -21,6 +21,9 @@ import os
 app = Flask(__name__)
 # app 配置
 app.config['SECRET_KEY'] = os.urandom(24)
+app.config['BASE_PATH'] = os.path.dirname(__file__)
+app.config['UPLOAD_FILE_FOLDER'] = r'static\images'
+app.config['UPLOAD_TMEP_FILE_FOLDER'] = r'static\images\temp'
 
 from app.route.requestHandler import after_request
 from app.database import app_db_init
