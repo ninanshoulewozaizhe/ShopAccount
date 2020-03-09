@@ -10,6 +10,8 @@ from app.utils import form2Dict, getSalesCountfromSalesStr, imgSave
 from app.log import logger
 from datetime import date
 import json
+import os
+from app import app
 from app.route.requestHandler import user_session_check
 
 shop_controller = Blueprint('shop_controller', __name__)
@@ -91,6 +93,27 @@ def getShopPreProducts(sid):
     products = Product.serialize_list(products)
     return jsonify(status=True, message='succeed', data=products)
     
-@shop_controller.route('/shopImg/<int:sid>', methods=['PUT'])
+@shop_controller.route('/shopImg/<int:sid>', methods=['POST'])
 def updateShopImg(sid):
-    pass
+    img = request.files['file']
+    if img is None:
+        return jsonify(status=False, message="img not existed", data='')
+    username = session.get('username')
+    imgPrefix = username + '-shop'
+    imgName = imgSave(img, imgPrefix)
+    shop = get_shop_detail(sid)
+    originImg = shop['img']
+    originImgPath = os.path.join(app.instance_path, 'app/static/images', originImg)
+    os.remove(originImgPath)
+    update_shop_img(sid, imgName)
+    return jsonify(status=True, message="img upload succeed", data=imgName)
+
+@shop_controller.route('/shopImg', methods=['POST'])
+def uploadShopImg():
+    img = request.files['file']
+    if img is None:
+        return jsonify(status=False, message="img not existed", data='')
+    username = session.get('username')
+    imgPrefix = username + '-shop'
+    imgName = imgSave(img, imgPrefix)
+    return jsonify(status=True, message="img upload succeed", data=imgName)

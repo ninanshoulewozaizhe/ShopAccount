@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, jsonify, session
-from app.app import create_app
 # from app.database.models import db_init, User, Product, Shop, SalesVolumes
 # from app.database.user import create_user, username_exist, \
 #     user_verification, update_user_info, get_uid_by_username
@@ -17,8 +16,19 @@ from app.app import create_app
 from app.log import logger
 from datetime import date
 import json
+import os
 
-app = create_app()
+app = Flask(__name__)
+# app 配置
+app.config['SECRET_KEY'] = os.urandom(24)
+
+from app.route.requestHandler import after_request
+from app.database import app_db_init
+from app.route import bp_register
+
+app.after_request(after_request)
+app_db_init()
+bp_register()
 
 @app.route('/', methods=['GET'])
 def hello():
