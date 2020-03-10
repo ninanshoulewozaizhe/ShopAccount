@@ -3,9 +3,9 @@ from app.database.models import User, Product, Shop, SalesVolumes
 from app.database.user import get_uid_by_username
 from app.database.product import increase_product_sales, update_product_inventory
 from app.database.shop import increase_shop_sales
-from app.database.salesVolumes import create_new_record, get_sales_one_day, \
+from app.database.salesVolumes import create_new_record, get_record_one_day, \
     get_records_by_period, update_record_sales, delete_records_by_date, \
-    delete_record    
+    delete_record, get_shop_records_one_day    
 from app.utils import form2Dict, getSalesCountfromSalesStr
 from app.log import logger
 from datetime import date
@@ -19,7 +19,7 @@ sales_controller.before_request(user_session_check)
 # 销量记录controller
 @sales_controller.route('/createSalesRecord', methods=['POST'])
 def createSalesRecord():
-    recordInfo = form2Dict(request.json, {'pid': '', 'sid': '', 'date': date.today().isoformat(), 'sales': ''})
+    recordInfo = form2Dict(request.json, {'pid': '', 'sid': '', 'pname': '', 'date': date.today().isoformat(), 'sales': ''})
     recordInfo['date'] = date.fromisoformat(recordInfo['date'])
     recordInfo['sales'] = json.dumps(ast.literal_eval(recordInfo['sales']))
     rid = create_new_record(recordInfo)
@@ -31,21 +31,31 @@ def createSalesRecord():
     increase_shop_sales(request.form.get('sid', '-1'), salesCount)
     return jsonify(status=True, message='succeed', data={'rid': rid})
 
+@sales_controller.route('/shopSalesRecords/<int:sid>', methods=['GET'])
+def getShopSalesOneDay(sid):
+    rdate = request.args.get('date', date.today().isoformat())
+    rdate = date.fromisoformat(rdate)
+    records = get_shop_records_one_day(sid, rdate)
+    records = SalesVolumes.serialize_list(records)
+    return jsonify(status=True, message='succeed', data=records)
+
 @sales_controller.route('/salesRecord/<int:pid>', methods=['GET', 'PUT', 'DELETE'])
 def salesRecordHandler(pid):
     # get record info
     if request.method == 'GET':
         rdate = request.args.get('date', date.today().isoformat())
         rdate = date.fromisoformat(rdate)
-        sales = get_sales_one_day(pid, rdate)
-        return jsonify(status=True, message='succeed', date=sales)
+        record = get_record_one_day(pid, rdate)
+        if record is None:
+            return jsonify(status=False, message='failed', data='')
+        return jsonify(status=True, message='succeed', date=record.serialize())
     # update record info
     elif request.method == 'PUT':
         recordDate = request.json.get('date', date.today().isoformat())
         recordDate = date.fromisoformat(recordDate)
         newSales = json.dumps(ast.literal_eval(request.json.get('sales', '')))
         # 更新记录表
-        originRecord = get_sales_one_day(pid, recordDate)
+        originRecord = get_record_one_day(pid, recordDate)
         if originRecord is not None:
             originSalesCount = getSalesCountfromSalesStr(originRecord['sales'])
             newSalesCount = getSalesCountfromSalesStr(newSales)
@@ -63,7 +73,7 @@ def salesRecordHandler(pid):
     else:
         recordDate = request.json.get('date', date.today().isoformat())
         recordDate = date.fromisoformat(recordDate)
-        originRecord = get_sales_one_day(pid, recordDate)
+        originRecord = get_record_one_day(pid, recordDate)
         if originRecord  is not None:
             originSalesCount = getSalesCountfromSalesStr(originRecord['sales'])
             # 减少商品销量

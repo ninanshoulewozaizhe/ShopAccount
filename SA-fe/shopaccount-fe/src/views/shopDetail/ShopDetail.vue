@@ -11,6 +11,9 @@
           :name="product.name" 
           :salesVolume="product.salesVolume"></product-card>
         </div>
+        <div class="no_products_tips" v-if="!showProducts.length">
+          店内暂无商品，请前往店铺管理添加商品。
+        </div>
         <span class="product_get_more" @click="getShopManage">店铺管理>></span>
     </div>
     </div>
@@ -19,7 +22,7 @@
         <h3>今日商品销量(总计: {{ productSalesVolumeToday }} 件)</h3>
         <el-table class="sales_show_table" :data="showTable" border>
           <el-table-column align="center" prop="name" label="商品名称" width="300"></el-table-column>
-          <el-table-column align="center" prop="salesVolume" label="销量" ></el-table-column>
+          <el-table-column align="center" prop="salesVolumes" label="销量" ></el-table-column>
         </el-table>
         <el-pagination class="table_pagination" layout="prev, pager, next" 
         :total="allTableData.length"
@@ -49,46 +52,40 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import AppIcon from '../../../public/images/accountBook.jpg';
-import { IProductDetailItem } from '@/typing/home/typings';
 import { IProductDetailItem } from '@/typing/productDetail/typings';
+import { SalesRecordItem, OneDaySalesItem } from '@/typing/salesStatus/typings';
 import productCard from '@/components/home/productCard.vue';
 import store from '@/store';
 import { LOAD_CUR_SHOP, GET_CUR_SHOP, ADD_NEW_SHOP } from '@/store/modules/shop/constants';
 import { LOAD_CUR_SHOP_PRE_PRODUCTS, GET_CUR_SHOP_PRODUCTS } from '@/store/modules/product/constants';
+import { LOAD_CUR_SHOP_TODAY_SALES, GET_CUR_SHOP_TODAY_SALES } from '@/store/modules/salesStatus/constants';
 
 @Component({
   name: 'shopDetail',
   components: {
     productCard
-  }
+  },
   async beforeRouteEnter(to: any, from: any, next: any) {
     const sid = to.params.sid;
+    const dateStr = new Date().toISOString().split('T')[0];
     await store.dispatch(`product/${LOAD_CUR_SHOP_PRE_PRODUCTS}`, sid);
+    await store.dispatch(`salesStatus/${LOAD_CUR_SHOP_TODAY_SALES}`, {sid, date: dateStr});
     const products = store.getters[`product/${GET_CUR_SHOP_PRODUCTS}`];
+    const todaySales = store.getters[`salesStatus/${GET_CUR_SHOP_TODAY_SALES}`];
+    console.log(products);
+    console.log(todaySales);
     next((vm: any) => {
       vm.showProducts = [ ...products ];
+      vm.allTableData = [ ...todaySales ];
+      vm.tableDataformat();
+      vm.showTableInit();
     });
   }
 })
 export default class ShopDetail extends Vue {
-  allTableData: IProductDetailItem[] = [
-    {id: 1, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 2, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 3, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 4, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 5, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 6, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 7, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 8, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 9, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 10, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 11, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 12, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 13, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'},
-    {id: 14, name: '韩版卫衣', salesVolumes: 11, sid: 1, shop: '好再来服饰'}
-    ];
+  allTableData: SalesRecordItem[] = [];
   showtableSize = 4;
-  showTable: IProductDetailItem[]  = [];
+  showTable: SalesRecordItem[]  = [];
   showProducts: IProductDetailItem[] = [];
 
   chartData = {
@@ -139,6 +136,14 @@ export default class ShopDetail extends Vue {
     this.showTableInit();
   }
 
+  tableDataformat() {
+    for (const record of this.allTableData) {
+      record.salesVolumes = Object.values(record.sales).reduce((pre: number, cur: number) => {
+        return pre + cur;
+      }, 0);
+    }
+  }
+
   showTableInit() {
     for (let i = 0; i < this.showtableSize && i < this.allTableData.length; ++i) {
       this.showTable.push(this.allTableData[i]);
@@ -147,7 +152,10 @@ export default class ShopDetail extends Vue {
 
   get productSalesVolumeToday() {
     return this.allTableData.reduce((pre, cur) => {
-      return pre + cur.salesVolumes;
+      if (cur.salesVolumes) {
+        return pre + cur.salesVolumes;
+      }
+      return pre;
     }, 0);
   }
 
@@ -194,8 +202,11 @@ export default class ShopDetail extends Vue {
     }
   }
   
-
+  .no_products_tips {
+    margin-bottom: 10px;
+  }
   .product_get_more {
+    color: #20A4E5;
     position: relative;
     bottom: 3px;
   }

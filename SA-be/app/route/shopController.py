@@ -57,15 +57,10 @@ def shopHandler(sid):
             return jsonify(status=False, message='shop not existed', data='')
         else:
             shop = shop.serialize()
-            preProducts = get_preview_prodcuts_by_sid(shop['id'], 4)
-            preProductImgs = []
-            for product in preProducts:
-                preProductImgs.append(product['img'])
-            shop['preProductImg'] = preProductImgs
             return jsonify(status=True, message='succeed', data=shop)
     # update shop info
     elif request.method == 'PUT':
-        shopInfo = form2Dict(request.json, {'id': sid, 'name': '', 'description': ''})
+        shopInfo = form2Dict(request.json, {'id': sid, 'name': '', 'description': '', 'img': ''})
         logger.info(f'try to update shop: id: {sid} info: {shopInfo}')
         status = update_shop_info(shopInfo)
         if status:

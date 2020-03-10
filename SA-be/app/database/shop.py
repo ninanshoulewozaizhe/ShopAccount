@@ -23,6 +23,7 @@ def get_shop_detail(sid):
 def update_shop_info(newInfo):
     shop = Shop.query.filter_by(id=newInfo['id']).first()
     if shop is not None:
+        shop.img = newInfo['img']
         shop.name = newInfo['name']
         shop.description = newInfo['description']
         db.session.commit()

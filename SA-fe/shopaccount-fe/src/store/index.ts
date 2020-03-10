@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import user from './modules/user';
 import shop from './modules/shop';
 import product from './modules/product';
-// import salesStatus from './modules/salesStatus';
+import salesStatus from './modules/salesStatus';
 import { ModuleState } from '@/typing/vuex/typings';
 
 Vue.use(Vuex);
@@ -11,7 +11,8 @@ Vue.use(Vuex);
 const modules = {
   user,
   shop,
-  product
+  product,
+  salesStatus
 };
 
 const rootStore = new Vuex.Store<RootState>({

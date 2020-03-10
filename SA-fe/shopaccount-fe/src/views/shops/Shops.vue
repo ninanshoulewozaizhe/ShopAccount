@@ -64,7 +64,6 @@ import AppIcon from '../../../public/images/accountBook.jpg';
 import store from '@/store';
 import { LOAD_ALL_SHOPS, GET_ALL_SHOPS, ADD_NEW_SHOP } from '../../store/modules/shop/constants';
 import { UID } from '@/store/modules/user/constants';
-import { IShopPreItem } from '../../typing/shops/typings';
 
 @Component({
   name: 'shops',
@@ -188,7 +187,7 @@ export default class Shops extends Vue {
     return isJPGorPNG && isLt10M;
   }
 
-  async avatarUploadSuccess(res) {
+  async avatarUploadSuccess(res: any) {
     console.log(res);
     this.newShop.img = res.data;
     console.log(this.newShop.img);

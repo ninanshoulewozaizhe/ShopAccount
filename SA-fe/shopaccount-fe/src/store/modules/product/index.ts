@@ -12,7 +12,6 @@ import {
 import { httpRequestSilence } from '@/utils/httpRequest';
 import { IResponse } from '@/typing/vuex/typings';
 import { IProductDetailItem } from '@/typing/productDetail/typings';
-import { MODIFY_CUR_SHOP } from '../shop/constants';
 
 export default {
   namespaced: true,
@@ -71,7 +70,7 @@ export default {
     [MODIFY_ALL_PRODUCTS](state, payload: IProductDetailItem[]) {
       state.allProducts = payload;
     },
-    [MODIFY_CUR_SHOP](state, payload: IProductDetailItem[]) {
+    [MODIFY_CUR_SHOP_PRODUCTS](state, payload: IProductDetailItem[]) {
       state.curShopProducts = payload;
     }
   },

@@ -12,5 +12,6 @@ def app_db_init():
     db.init_app(app)
     db.app = app
 
+
     # #数据库初始化
     # db_init()

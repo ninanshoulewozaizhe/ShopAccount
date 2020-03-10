@@ -65,7 +65,7 @@ def productHandler(pid):
     # update product info
     elif request.method == 'PUT':
         productInfo = form2Dict(request.json, {'id':'-1', 'name': '', 'status':'on-sale', \
-            'description': '', 'type':'', 'cost': 0, 'price': 0})
+            'description': '', 'type':'', 'img': ''})
         productInfo['type'] = json.dumps(ast.literal_eval(productInfo['type']))
         status = update_product_info(productInfo)
         if status:

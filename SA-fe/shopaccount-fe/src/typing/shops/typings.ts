@@ -1,7 +1,7 @@
 export interface IShopItem {
     id: number;
     uid: number;
-    img?: any;
+    img?: string;
     name: string;
     description?: string;
     salesVolumes: number;
@@ -11,7 +11,7 @@ export interface IShopItem {
 export interface IShopPreItem {
     id: number;
     uid: number;
-    img?: any;
+    img?: string;
     name: string;
     description?: string;
     salesVolumes: number;

@@ -56,6 +56,7 @@ class SalesVolumes(db.Model, Serializer):
     __tablename__ = 'salesVolumes'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     pid = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    pname = db.Column(db.String(32), nullable=False)
     sid = db.Column(db.Integer, db.ForeignKey('shop.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
     sales = db.Column(db.Text)
@@ -69,3 +70,4 @@ def db_init():
     print('创建数据库')
     db.drop_all()
     db.create_all()
+    print('创建数据库成功')

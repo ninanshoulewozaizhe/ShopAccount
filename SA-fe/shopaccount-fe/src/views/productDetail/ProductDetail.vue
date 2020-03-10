@@ -309,7 +309,7 @@ export default class ProductDetail extends Vue {
     return isJPGorPNG && isLt10M;
   }
 
-  async avatarUploadSuccess(res) {
+  async avatarUploadSuccess(res: any) {
     this.modifyProduct.img = `/static/images/${res.data}?t=${Math.random()}`;
     this.$message.success('图片上传成功');
   }

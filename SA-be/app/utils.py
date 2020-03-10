@@ -49,7 +49,7 @@ def imgSave(imgfile, imgPrefix):
     imgName = f'{imgPrefix}-{upid}.png'
     FINAL_PATH = r'static\images'
     cv2.imencode('.png', img)[1].tofile(os.path.join(basepath, FINAL_PATH, imgName))
-
+    os.remove(upload_temp_path)
     logger.info(f'转后图片名称: {imgName}')
 
     return imgName
