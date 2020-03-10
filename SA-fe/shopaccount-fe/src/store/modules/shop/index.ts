@@ -81,7 +81,7 @@ export default {
     async [DELETE_SHOP]({ commit }, payload: IShopItem): Promise<string> {
       try {
         const { data } = await httpRequestSilence.delete<IResponse<string> >(
-          `/shops/${payload.id}`);
+          `/shop/${payload.id}`);
         if (data.status) {
           return Promise.resolve('OK');
         } else {

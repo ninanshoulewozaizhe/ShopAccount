@@ -7,7 +7,10 @@ import {
   MODIFY_CUR_SHOP_PRODUCTS,
   LOAD_ALL_PRODUCTS,
   LOAD_CUR_SHOP_PRODUCTS,
-  LOAD_CUR_SHOP_PRE_PRODUCTS
+  LOAD_CUR_SHOP_PRE_PRODUCTS,
+  ADD_NEW_PRODUCT,
+  UPDATE_PRODUCT,
+  DELETE_PRODUCT
 } from './constants';
 import { httpRequestSilence } from '@/utils/httpRequest';
 import { IResponse } from '@/typing/vuex/typings';
@@ -57,6 +60,45 @@ export default {
         );
         if (data.status) {
           commit(MODIFY_CUR_SHOP_PRODUCTS, data.data);
+          return Promise.resolve('OK');
+        } else {
+          return Promise.resolve(data.message);
+        }
+      } catch (error) {
+        return Promise.resolve(error);
+      }
+    },
+    async [ADD_NEW_PRODUCT]({ commit }, payload: IProductDetailItem): Promise<any> {
+      try {
+        const { data } = await httpRequestSilence.post<IResponse<any> >(
+          `/createProduct`, payload);
+        if (data.status) {
+          return Promise.resolve({status: true, pid: data.data.pid});
+        } else {
+          return Promise.resolve(data.message);
+        }
+      } catch (error) {
+        return Promise.resolve(error);
+      }
+    },
+    async [UPDATE_PRODUCT]({ commit }, payload: IProductDetailItem): Promise<string> {
+      try {
+        const { data } = await httpRequestSilence.put<IResponse<string> >(
+          `/product/${payload.id}`, payload);
+        if (data.status) {
+          return Promise.resolve('OK');
+        } else {
+          return Promise.resolve(data.message);
+        }
+      } catch (error) {
+        return Promise.resolve(error);
+      }
+    },
+    async [DELETE_PRODUCT]({ commit }, payload: IProductDetailItem): Promise<string> {
+      try {
+        const { data } = await httpRequestSilence.delete<IResponse<string> >(
+          `/product/${payload.id}`);
+        if (data.status) {
           return Promise.resolve('OK');
         } else {
           return Promise.resolve(data.message);

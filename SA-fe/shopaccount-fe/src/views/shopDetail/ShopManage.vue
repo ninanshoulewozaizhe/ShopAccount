@@ -52,7 +52,7 @@
               <div class="info_dialog_container">
                 <el-upload
                   class="avatar-uploader"
-                  action="/shopImg"
+                  action="/productImg"
                   :show-file-list="false"
                   :on-success="productAvatarUploadSuccess"
                   :before-upload="beforeAvatarUpload">
@@ -94,8 +94,8 @@
                 </div>
               </div>
               <div slot="footer" class="dialog-footer">
-                <el-button @click="AddNewProductDialog = false">取 消</el-button>
-                <el-button type="primary" @click="AddNewProductDialog = false">确 定</el-button>
+                <el-button @click="cancelAddNewProduct">取 消</el-button>
+                <el-button type="primary" @click="submitAddNewProduct">确 定</el-button>
               </div>
             </el-dialog>
           </div>
@@ -109,10 +109,12 @@
       <div class="product_list">
         <h3>商品列表</h3>
         <product-list
+        v-if="allProducts.length"
+        ref="productList"
         :allProducts="allProducts"
         :showPageSize="showPageSize"
         ></product-list>
-        <div>店内暂无商品，请添加商品。</div>
+        <div v-else>店内暂无商品，请添加商品。</div>
       </div>
       <!-- <div class="products_sales_date">
         <h3>销量统计</h3>
@@ -145,7 +147,7 @@ import { IProductDetailItem, ISuggestObj, IProductSalesItem } from '@/typing/pro
 import { IShopItem } from '@/typing/shops/typings';
 import { IProductItem } from '@/typing/home/typings';
 import store from '@/store';
-import { LOAD_CUR_SHOP_PRODUCTS, GET_CUR_SHOP_PRODUCTS } from '@/store/modules/product/constants';
+import { LOAD_CUR_SHOP_PRODUCTS, GET_CUR_SHOP_PRODUCTS, ADD_NEW_PRODUCT } from '@/store/modules/product/constants';
 import { LOAD_CUR_SHOP, GET_CUR_SHOP, UPDATE_SHOP } from '@/store/modules/shop/constants';
 @Component({
   name: 'shopManage',
@@ -165,6 +167,7 @@ import { LOAD_CUR_SHOP, GET_CUR_SHOP, UPDATE_SHOP } from '@/store/modules/shop/c
       vm.allProducts = [ ...products ];
       vm.shop = { ...shop };
       vm.modifyShop = { ...shop };
+      vm.newProductInfoClear();
     });
   }
 })
@@ -270,7 +273,7 @@ export default class ShopManage extends Vue {
   updatePType() {
     this.PNewType = this.PNewType.trim();
     if (this.PNewType) {
-      this.$set(this.newProduct.type, this.PNewType, this.PNewTypeAmount);
+      this.$set(this.newProduct.type, this.PNewType, +this.PNewTypeAmount);
     }
   }
 
@@ -325,6 +328,59 @@ export default class ShopManage extends Vue {
           message: result || '更新失败，请稍后重试'
         });
         this.modifyShop = { ...this.shop };
+    }
+  }
+
+  newProductInfoClear() {
+    this.newProduct = {
+      id: -1,
+      name: '',
+      description: '',
+      salesVolumes: 0,
+      img: '',
+      sid: this.shop.id,
+      shop: this.shop.name,
+      type: {}
+    };
+    this.PNewType = '';
+    this.PNewTypeAmount = 0;
+  }
+
+  cancelAddNewProduct() {
+    this.newProductInfoClear();
+    this.AddNewProductDialog = false;
+  }
+
+  updateProductList(newProductInfo: IProductDetailItem) {
+    this.allProducts.push(newProductInfo);
+  }
+
+  async submitAddNewProduct() {
+    let fields = JSON.parse(JSON.stringify(this.newProduct));
+    fields.type = JSON.stringify(fields.type);
+    fields = Object.freeze(fields);
+    console.log(fields);
+    const result = await this.$store.dispatch(`product/${ADD_NEW_PRODUCT}`, fields);
+    this.AddNewProductDialog = false;
+    if (result.status) {
+      this.$notify({
+        title: '添加成功',
+        message: '新商品已添加',
+        type: 'success'
+      });
+      console.log(result);
+      this.newProduct.id = +result.pid;
+      console.log(this.newProduct);
+      this.updateProductList({ ...this.newProduct });
+      console.log(this.allProducts);
+      this.newProductInfoClear();
+      const list: any = this.$refs.productList;
+      list.updateList();
+    } else {
+      this.$notify.error({
+          title: '创建失败',
+          message: '请稍后再试'
+        });
     }
   }
 

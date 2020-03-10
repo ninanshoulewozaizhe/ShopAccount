@@ -8,7 +8,8 @@
         <div class="card_wrapper" v-for="product in showProducts" 
           :key="product.id" @click="getProductDetail(product.id)">
           <product-card class="p_card"  
-          :name="product.name" 
+          :name="product.name"
+          :image="`/getImg?f=${product.img}&t=${Math.random()}`"
           :salesVolume="product.salesVolume"></product-card>
         </div>
         <div class="no_products_tips" v-if="!showProducts.length">

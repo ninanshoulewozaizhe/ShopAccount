@@ -1,10 +1,11 @@
 <template>
     <div>
-      <product-list 
+      <product-list v-if="allProducts.length"
       :allProducts="allProducts"
       :showPageSize="showPageSize"
+      ref="list"
       ></product-list>
-      <div v-if="allProducts.length == 0">暂无店铺商品，请前往店铺列表选择店铺添加商品哦</div>        
+      <div v-else>暂无店铺商品，请前往店铺列表选择店铺添加商品哦</div>        
     </div>
 </template>
 
@@ -23,17 +24,19 @@ import { LOAD_ALL_PRODUCTS, GET_ALL_PRODUCTS } from '@/store/modules/product/con
   },
   async beforeRouteEnter(to: any, from: any, next: any) {
     await store.dispatch(`product/${LOAD_ALL_PRODUCTS}`);
-    const products = store.getters[`product/${GET_ALL_PRODUCTS}`];
-    console.log(products);
-    next((vm: any) => {
-      vm.allProducts = [ ...products ];
-    });
+    next();
   }
 })
 export default class Home extends Vue {
   allProducts: IProductDetailItem[] = [];
 
   showPageSize = 10;
+
+  mounted() {
+    const products = store.getters[`product/${GET_ALL_PRODUCTS}`];
+    this.allProducts = [ ...products ];
+    console.log(this.allProducts);
+  }
 
 }
 </script>

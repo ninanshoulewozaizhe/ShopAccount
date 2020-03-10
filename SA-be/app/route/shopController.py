@@ -42,8 +42,8 @@ def getAllShops():
             preProducts = get_preview_prodcuts_by_sid(shop['id'], 4)
             preProductImgs = []
             for product in preProducts:
-                preProductImgs.append(product['img'])
-            shop['preProductImg'] = preProductImgs
+                preProductImgs.append(product.img)
+            shop['preProductImgs'] = preProductImgs
         return jsonify(status=True, message='all shops', data=shops)
     
 

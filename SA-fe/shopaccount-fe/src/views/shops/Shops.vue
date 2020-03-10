@@ -74,6 +74,7 @@ import { UID } from '@/store/modules/user/constants';
     await store.dispatch(`shop/${LOAD_ALL_SHOPS}`);
     const shops = store.getters[`shop/${GET_ALL_SHOPS}`];
     const USERID = store.getters[`user/${UID}`];
+    console.log(shops);
     next((vm: any) => {
       vm.shopList = [ ...shops ];
       vm.USERID = USERID;
@@ -187,7 +188,7 @@ export default class Shops extends Vue {
     return isJPGorPNG && isLt10M;
   }
 
-  async avatarUploadSuccess(res: any) {
+  avatarUploadSuccess(res: any) {
     console.log(res);
     this.newShop.img = res.data;
     console.log(this.newShop.img);

@@ -4,12 +4,14 @@
       <div class="card_wrapper"  v-for="product in showProducts" :key="product.id" @click="getProductDetail(product.id)">
         <product-card class="p_card"
           :name="product.name" 
-          :shop="product.shop" 
+          :shop="product.shop"
+          :image="`/getImg?f=${product.img}&t=${Math.random()}`"
           :salesVolume="product.salesVolumes"></product-card>
       </div>
       <el-pagination class="pagination" layout="prev, pager, next" 
       :total="allProducts.length"
       :page-size="showPageSize"
+      :current-page="curPage"
       @current-change="pageChange"
       v-if="allProducts.length != 0"></el-pagination>
     </div>
@@ -33,6 +35,7 @@ export default class ProductList extends Vue {
 @Prop() readonly showPageSize!: number;
 
   showProducts: IProductDetailItem[] = [];
+  curPage = 1;
 
   mounted() {
     this.showProductsInit();
@@ -42,6 +45,10 @@ export default class ProductList extends Vue {
     for (let i = 0; i < this.showPageSize && i < this.allProducts.length; ++i) {
       this.showProducts.push(this.allProducts[i]);
     }
+  }
+
+  updateList() {
+    this.pageChange(this.curPage);
   }
 
   pageChange(curPage: number) {

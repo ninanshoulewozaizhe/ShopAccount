@@ -18,7 +18,7 @@ product_controller = Blueprint('product_controller', __name__)
 product_controller.before_request(user_session_check)
 
 # 商品controller
-@product_controller.route('/product', methods=['POST'])
+@product_controller.route('/createProduct', methods=['POST'])
 def createProduct():
     productInfo = form2Dict(request.json, {'name': '', 'status':'on-sale', 'description': '', \
         'img': '', 'sid': '-1', 'shop': '', 'type':'', 'salesVolumes': 0})
@@ -85,3 +85,13 @@ def productHandler(pid):
 @product_controller.route('/productImg/<int:pid>', methods=['PUT'])
 def updateProductImg(pid):
     pass
+
+@product_controller.route('/productImg', methods=['POST'])
+def uploadProductImg():
+    img = request.files['file']
+    if img is None:
+        return jsonify(status=False, message="img not existed", data='')
+    username = session.get('username')
+    imgPrefix = username + '-product'
+    imgName = imgSave(img, imgPrefix)
+    return jsonify(status=True, message="img upload succeed", data=imgName)
