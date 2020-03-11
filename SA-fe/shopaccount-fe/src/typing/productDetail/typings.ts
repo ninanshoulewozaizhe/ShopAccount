@@ -10,6 +10,10 @@ export interface IndexOJ {
     [index: string]: number;
 }
 
+export interface IndexStingOJ {
+    [index: string]: any;
+}
+
 export interface IProductDetailItem {
     id: number;
     name: string;
@@ -24,5 +28,5 @@ export interface IProductDetailItem {
 export interface IProductSalesItem {
     type: string;
     amount: number;
-    disable: boolean;
+    disable?: boolean;
 }

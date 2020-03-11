@@ -378,8 +378,8 @@ export default class ShopManage extends Vue {
       list.updateList();
     } else {
       this.$notify.error({
-          title: '创建失败',
-          message: '请稍后再试'
+          title: '添加失败',
+          message: '新商品添加失败,请稍后再试'
         });
     }
   }

@@ -29,7 +29,7 @@ def update_product_info(newInfo):
     product = Product.query.filter_by(id=newInfo['id']).first()
     if product is not None:
         product.name = newInfo['name']
-        product.name = newInfo['img']
+        product.img = newInfo['img']
         product.description = newInfo['description']
         product.status = newInfo['status']
         product.type = newInfo['type']

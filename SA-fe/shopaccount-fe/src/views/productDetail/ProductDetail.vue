@@ -2,7 +2,7 @@
   <div>
     <h3>商品详情</h3>
     <div class="p_info_container">
-      <img class="p_img" :src="product.img" alt="p_img">
+      <img class="p_img" :src="`/getImg?f=${product.img}&t=${Math.random()}`" alt="p_img">
       <div class="p_info">
         <div>
           <div class="p_name">{{ product.name }}</div>
@@ -20,9 +20,9 @@
                   class="img-uploader"
                   action="/shopImg"
                   :show-file-list="false"
-                  :on-success="handleImgSuccess"
+                  :on-success="imgUploadSuccess"
                   :before-upload="beforeImgUpload">
-                  <img v-if="modifyProduct.img" :src="modifyProduct.img" class="p_info_img">
+                  <img v-if="modifyProduct.img" :src="`/getImg?f=${modifyProduct.img}&t=${Math.random()}`" class="p_info_img">
                   <i v-else class="el-icon-plus img-uploader-icon"></i>
                 </el-upload>
                 <el-form>
@@ -60,8 +60,8 @@
                 </div>
               </div>
               <div slot="footer" class="dialog-footer">
-                <el-button @click="showUpdateDialog = false">取 消</el-button>
-                <el-button type="primary" @click="showUpdateDialog = false">确 定</el-button>
+                <el-button @click="cancelProductUpdate">取 消</el-button>
+                <el-button type="primary" @click="submitProductUpdate">确 定</el-button>
               </div>
             </el-dialog>
             <el-dialog class="p_sales_dialog" title="更新销量" :visible.sync="showSalesDialog">
@@ -79,11 +79,11 @@
                       <br/>
                       <el-select v-model="PSalesUpadteType">
                         <el-option
-                          v-for="item in productSales"
-                          :key="item.type"
-                          :label="item.type"
-                          :value="item.type"
-                          :disabled="item.disable">
+                          v-for="item in Object.keys(updateSales)"
+                          :key="item"
+                          :label="item"
+                          :value="item"
+                        >
                         </el-option>
                       </el-select> : 
                       <el-input class="p_info_new_type_stocks_input" type="number" v-model="PSalesUpadteAmount"></el-input>
@@ -91,8 +91,8 @@
                     </el-form-item>
                 </el-form>
                 <div>
-                  <div class="type_list" v-for="item in productSales" :key="item.type">
-                    <div>{{`${item.type} : ${item.amount}`}}</div>
+                  <div class="type_list" v-for="(value, name) in updateSales" :key="name">
+                    <div>{{`${name} : ${value}`}}</div>
                   </div>
                 </div>
               </div>
@@ -112,7 +112,7 @@
           <el-radio-button label="today">今日销量</el-radio-button>
           <el-radio-button label="yesterday">昨日销量</el-radio-button>
         </el-radio-group>
-        <horizontalSaleTable class="sales_table" :data="productSales"></horizontalSaleTable>
+        <horizontalSaleTable class="sales_table" :data="HtableDatashow"></horizontalSaleTable>
       </div>
       <div class="products_sales_date">
         <h3>销量统计</h3>
@@ -145,12 +145,40 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import AppIcon from '../../../public/images/accountBook.jpg';
 import horizontalSaleTable from '@/components/productDetail/horizontalSaleTable.vue';
-import { IProductDetailItem, ISuggestObj, IProductSalesItem } from '@/typing/productDetail/typings';
+import { IProductDetailItem, ISuggestObj, IProductSalesItem, IndexStingOJ } from '@/typing/productDetail/typings';
+import store from '@/store';
+import { LOAD_CUR_PRODUCT, GET_CUR_PRODUCT, UPDATE_PRODUCT } from '@/store/modules/product/constants';
+import { LOAD_CUR_PRODUCT_TODAY_SALES, LOAD_CUR_PRODUCT_YESTERDAY_SALES,
+  GET_CUR_PRODUCT_TODAY_SALES, GET_CUR_PRODUCT_YESTERDAY_SALES
+  } from '@/store/modules/salesStatus/constants';
+import { SalesRecordItem } from '@/typing/salesStatus/typings';
 
+import { Form } from 'element-ui';
 @Component({
   name: 'productDetail',
   components: {
     horizontalSaleTable
+  },
+  async beforeRouteEnter(to: any, from: any, next: any) {
+    const pid = to.params.pid;
+    const todayStr = new Date().toISOString().split('T')[0];
+    const yesterdayStr = new Date(+new Date() - 1000 * 60 * 60 * 24).toISOString().split('T')[0];
+    console.log(todayStr);
+    console.log(yesterdayStr);
+    await store.dispatch(`product/${LOAD_CUR_PRODUCT}`, pid);
+    await store.dispatch(`product/${LOAD_CUR_PRODUCT_TODAY_SALES}`, {pid, date: todayStr});
+    await store.dispatch(`product/${LOAD_CUR_PRODUCT_YESTERDAY_SALES}`, {pid, date: yesterdayStr});
+    const product = store.getters[`product/${GET_CUR_PRODUCT}`];
+    const todaySales = store.getters[`product/${GET_CUR_PRODUCT_TODAY_SALES}`];
+    const yesterdaySales = store.getters[`product/${GET_CUR_PRODUCT_YESTERDAY_SALES}`];
+    console.log(product);
+    next((vm: any) => {
+      vm.product = JSON.parse(JSON.stringify(product));
+      vm.modifyProduct = JSON.parse(JSON.stringify(product));
+      vm.todaySales = JSON.parse(JSON.stringify(todaySales));
+      vm.yesterdaySales = JSON.parse(JSON.stringify(yesterdaySales));
+      vm.updateSales = JSON.parse(JSON.stringify(todaySales));
+    });
   }
 })
 export default class ProductDetail extends Vue {
@@ -160,22 +188,14 @@ export default class ProductDetail extends Vue {
   showSalesDialog = false;
   salesVolumesUpdateDate = new Date();
   product: IProductDetailItem = {
-    id: 1,
-    name: '韩版卫衣',
-    description: '春秋季新潮品',
-    salesVolumes: 11,
+    id: -1,
+    name: '',
+    description: '',
+    salesVolumes: 0,
     img: AppIcon,
-    sid: 1,
-    shop: '好再来',
-    type: {
-      'S': 12,
-      'M': 23,
-      'L': 12,
-      'XL': 23,
-      'XXL': 24,
-      '3XL': 21,
-      '4XL': 23
-    }
+    sid: -1,
+    shop: '',
+    type: {}
   };
 
   modifyProduct: IProductDetailItem = JSON.parse(JSON.stringify(this.product));
@@ -183,33 +203,6 @@ export default class ProductDetail extends Vue {
   PNewTypeAmount = 0;
   PSalesUpadteType = '';
   PSalesUpadteAmount = 0;
-  productSales: IProductSalesItem[] = [
-    {
-      type: 'S',
-      amount: 12,
-      disable: false
-    },
-    {
-      type: 'M',
-      amount: 12,
-      disable: false
-    },
-    {
-      type: 'L',
-      amount: 12,
-      disable: true
-    },
-    {
-      type: 'XL',
-      amount: 12,
-      disable: false
-    },
-    {
-      type: 'XXL',
-      amount: 12,
-      disable: false
-    }
-  ];
 
   datePickerOptions = {
     shortcuts: [{
@@ -238,6 +231,40 @@ export default class ProductDetail extends Vue {
   };
 
   salesDatePick = [];
+
+  todaySales: SalesRecordItem = {
+    id: -1,
+    name: '',
+    pid: -1,
+    sid: -1,
+    date: '',
+    sales: {}
+  };
+  yesterdaySales: SalesRecordItem = {
+    id: -1,
+    name: '',
+    pid: -1,
+    sid: -1,
+    date: '',
+    sales: {}
+  };
+  updateSales: SalesRecordItem = {
+    id: -1,
+    name: '',
+    pid: -1,
+    sid: -1,
+    date: '',
+    sales: {}
+  };
+
+  get HtableDatashow() {
+    const data: IndexStingOJ = {
+      stock: this.product.type,
+      today: this.todaySales.sales,
+      yesterday: this.yesterdaySales.sales
+    };
+    return data[this.recentSalesShow];
+  }
 
   datePickerChange() {
     console.log(this.salesDatePick);
@@ -286,10 +313,10 @@ export default class ProductDetail extends Vue {
   }
 
   updatePSales() {
-    for (const item of this.productSales) {
-      if (item.type === this.PSalesUpadteType) {
-        this.$set(item, 'amount', +this.PSalesUpadteAmount);
-        console.log(this.productSales);
+    for (const type in this.updateSales) {
+      if (type === this.PSalesUpadteType) {
+        this.$set(this.updateSales, type, +this.PSalesUpadteAmount);
+        console.log(this.updateSales);
         break;
       }
     }
@@ -309,9 +336,41 @@ export default class ProductDetail extends Vue {
     return isJPGorPNG && isLt10M;
   }
 
-  async avatarUploadSuccess(res: any) {
-    this.modifyProduct.img = `/static/images/${res.data}?t=${Math.random()}`;
+  imgUploadSuccess(res: any) {
+    this.modifyProduct.img = res.data;
     this.$message.success('图片上传成功');
+  }
+
+  modifyProductInit() {
+    this.modifyProduct = JSON.parse(JSON.stringify(this.product));
+  }
+
+  cancelProductUpdate() {
+    this.modifyProductInit();
+    this.showUpdateDialog = false;
+  }
+
+  async submitProductUpdate() {
+    let fields = JSON.parse(JSON.stringify(this.modifyProduct));
+    fields.type = JSON.stringify(fields.type);
+    fields = Object.freeze(fields);
+    console.log(fields);
+    const result = await this.$store.dispatch(`product/${UPDATE_PRODUCT}`, fields);
+    this.showUpdateDialog = false;
+    if (result === 'OK') {
+      this.$notify({
+        title: '更新成功',
+        message: '商品信息已更新',
+        type: 'success'
+      });
+      this.product = { ...this.modifyProduct };
+    } else {
+        this.$notify.error({
+          title: '更新失败',
+          message: result || '更新失败，请稍后重试'
+        });
+        this.modifyProduct = { ...this.product };
+    }
   }
 }
 </script>

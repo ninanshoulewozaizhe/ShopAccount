@@ -3,10 +3,16 @@ import { State } from './typings';
 import {
   GET_CUR_SHOP_TODAY_SALES,
   GET_CUR_SHOP_PEROID_SALES,
+  GET_CUR_PRODUCT_TODAY_SALES,
+  GET_CUR_PRODUCT_YESTERDAY_SALES,
   MODIFY_CUR_SHOP_PEROID_SALES,
   MODIFY_CUR_SHOP_TODAY_SALES,
+  MODIFY_CUR_PRODUCT_TODAY_SALES,
+  MODIFY_CUR_PRODUCT_YESTERDAY_SALES,
   LOAD_CUR_SHOP_PEROID_SALES,
-  LOAD_CUR_SHOP_TODAY_SALES
+  LOAD_CUR_SHOP_TODAY_SALES,
+  LOAD_CUR_PRODUCT_TODAY_SALES,
+  LOAD_CUR_PRODUCT_YESTERDAY_SALES
 } from './constants';
 import { httpRequestSilence } from '@/utils/httpRequest';
 import { IResponse } from '@/typing/vuex/typings';
@@ -16,7 +22,9 @@ export default {
   namespaced: true,
   state: () => ({
     curShopPeriodSales: [],
-    curShopTodaySales: []
+    curShopTodaySales: [],
+    curProductTodaySales: null,
+    curProductYesterdaySales: null
   }),
   actions: {
     async [LOAD_CUR_SHOP_TODAY_SALES]({ commit }, payload: any): Promise<string> {
@@ -26,6 +34,36 @@ export default {
         );
         if (data.status) {
           commit(MODIFY_CUR_SHOP_TODAY_SALES, data.data);
+          return Promise.resolve('OK');
+        } else {
+          return Promise.resolve(data.message);
+        }
+      } catch (error) {
+        return Promise.resolve(error);
+      }
+    },
+    async [LOAD_CUR_PRODUCT_TODAY_SALES]({ commit }, payload: any): Promise<string> {
+      try {
+        const { data } = await httpRequestSilence.get<IResponse<SalesRecordItem> >(
+          `/salesRecord/${payload.Pid}?date=${payload.date}`
+        );
+        if (data.status) {
+          commit(MODIFY_CUR_PRODUCT_TODAY_SALES, data.data);
+          return Promise.resolve('OK');
+        } else {
+          return Promise.resolve(data.message);
+        }
+      } catch (error) {
+        return Promise.resolve(error);
+      }
+    },
+    async [LOAD_CUR_PRODUCT_YESTERDAY_SALES]({ commit }, payload: any): Promise<string> {
+      try {
+        const { data } = await httpRequestSilence.get<IResponse<SalesRecordItem> >(
+          `/salesRecord/${payload.Pid}?date=${payload.date}`
+        );
+        if (data.status) {
+          commit(MODIFY_CUR_PRODUCT_YESTERDAY_SALES, data.data);
           return Promise.resolve('OK');
         } else {
           return Promise.resolve(data.message);
@@ -56,6 +94,12 @@ export default {
     },
     [MODIFY_CUR_SHOP_PEROID_SALES](state, payload: OneDaySalesItem[]) {
       state.curShopPeriodSales = payload;
+    },
+    [MODIFY_CUR_PRODUCT_TODAY_SALES](state, payload: SalesRecordItem) {
+      state.curProductTodaySales = payload;
+    },
+    [MODIFY_CUR_PRODUCT_YESTERDAY_SALES](state, payload: SalesRecordItem) {
+      state.curProductYesterdaySales = payload;
     }
   },
   getters: {
@@ -64,6 +108,12 @@ export default {
     },
     [GET_CUR_SHOP_PEROID_SALES](state): OneDaySalesItem[] {
       return state.curShopPeriodSales;
+    },
+    [GET_CUR_PRODUCT_TODAY_SALES](state): SalesRecordItem | null {
+      return state.curProductTodaySales;
+    },
+    [GET_CUR_PRODUCT_YESTERDAY_SALES](state): SalesRecordItem | null {
+      return state.curProductYesterdaySales;
     }
   }
 } as Module<State, any>;
