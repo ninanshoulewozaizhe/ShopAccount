@@ -52,7 +52,7 @@ def delete_shop(sid):
 def increase_shop_sales(sid, salesVolumes):
     shop = Shop.query.filter_by(id=sid).first()
     if shop is not None:
-        shop.salesVolumes += salesVolumes
+        shop.salesVolumes += int(salesVolumes)
         db.session.commit()
         return True
     else:

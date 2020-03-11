@@ -66,7 +66,10 @@ def productHandler(pid):
     elif request.method == 'PUT':
         productInfo = form2Dict(request.json, {'id':'-1', 'name': '', 'status':'on-sale', \
             'description': '', 'type':'', 'img': ''})
-        productInfo['type'] = json.dumps(ast.literal_eval(productInfo['type']))
+        productInfo['type'] = ast.literal_eval(productInfo['type'])
+        for key in productInfo['type'].keys():
+            productInfo['type'][key] = int(productInfo['type'][key])
+        productInfo['type'] = json.dumps(productInfo['type'])
         status = update_product_info(productInfo)
         if status:
             return jsonify(status=True, message='succeed', data='')

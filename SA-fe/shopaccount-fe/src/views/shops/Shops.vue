@@ -42,7 +42,7 @@
       <shop-card class="card"
       :shopImg="shop.img"
       :name="shop.name"
-      :salesVolume="shop.salesVolume"
+      :salesVolume="shop.salesVolumes"
       :productAmount="shop.productAmount"
       :preProductImgs="shop.preProductImgs"
       ></shop-card>

@@ -18,7 +18,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import AppIcon from '../../../public/images/accountBook.jpg';
-import { IndexOJ } from '@/typing/productDetail/typings';
+import { IndexStingOJ } from '@/typing/productDetail/typings';
 import { IProductSalesItem } from '@/views/productDetail/typings';
 
 
@@ -27,11 +27,11 @@ import { IProductSalesItem } from '@/views/productDetail/typings';
 })
 export default class HorizontalSaleTable extends Vue {
 
-@Prop() readonly data!: IndexOJ;
+@Prop() readonly data!: IndexStingOJ;
 
   get salesSum() {
     return Object.values(this.data).reduce((pre: number, cur: number) => {
-      return pre + cur;
+      return pre + (+cur);
     }, 0);
   }
 }

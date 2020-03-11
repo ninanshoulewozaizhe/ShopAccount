@@ -6,4 +6,5 @@ export interface State {
     curShopPeriodSales: OneDaySalesItem[];
     curProductTodaySales: SalesRecordItem | null;
     curProductYesterdaySales: SalesRecordItem | null;
+    productOneDaySales: SalesRecordItem | null;
 }

@@ -10,7 +10,7 @@
           <product-card class="p_card"  
           :name="product.name"
           :image="`/getImg?f=${product.img}&t=${Math.random()}`"
-          :salesVolume="product.salesVolume"></product-card>
+          :salesVolume="product.salesVolumes"></product-card>
         </div>
         <div class="no_products_tips" v-if="!showProducts.length">
           店内暂无商品，请前往店铺管理添加商品。
@@ -22,7 +22,7 @@
       <div class="products_sales_today">
         <h3>今日商品销量(总计: {{ productSalesVolumeToday }} 件)</h3>
         <el-table class="sales_show_table" :data="showTable" border>
-          <el-table-column align="center" prop="name" label="商品名称" width="300"></el-table-column>
+          <el-table-column align="center" prop="pname" label="商品名称" width="300"></el-table-column>
           <el-table-column align="center" prop="salesVolumes" label="销量" ></el-table-column>
         </el-table>
         <el-pagination class="table_pagination" layout="prev, pager, next" 
@@ -60,6 +60,7 @@ import store from '@/store';
 import { LOAD_CUR_SHOP, GET_CUR_SHOP, ADD_NEW_SHOP } from '@/store/modules/shop/constants';
 import { LOAD_CUR_SHOP_PRE_PRODUCTS, GET_CUR_SHOP_PRODUCTS } from '@/store/modules/product/constants';
 import { LOAD_CUR_SHOP_TODAY_SALES, GET_CUR_SHOP_TODAY_SALES } from '@/store/modules/salesStatus/constants';
+import product from '../../store/modules/product';
 
 @Component({
   name: 'shopDetail',
@@ -76,8 +77,8 @@ import { LOAD_CUR_SHOP_TODAY_SALES, GET_CUR_SHOP_TODAY_SALES } from '@/store/mod
     console.log(products);
     console.log(todaySales);
     next((vm: any) => {
-      vm.showProducts = [ ...products ];
-      vm.allTableData = [ ...todaySales ];
+      vm.showProducts = JSON.parse(JSON.stringify(products));
+      vm.allTableData = JSON.parse(JSON.stringify(todaySales));
       vm.tableDataformat();
       vm.showTableInit();
     });
@@ -139,6 +140,9 @@ export default class ShopDetail extends Vue {
 
   tableDataformat() {
     for (const record of this.allTableData) {
+      if (typeof record.sales === 'string') {
+        record.sales = JSON.parse(record.sales);
+      }
       record.salesVolumes = Object.values(record.sales).reduce((pre: number, cur: number) => {
         return pre + cur;
       }, 0);

@@ -6,7 +6,7 @@ export interface SalesRecordItem {
     pid: number;
     sid: number;
     date: string;
-    sales: IndexOJ;
+    sales: IndexOJ | string;
     salesVolumes?: number;
 }
 

@@ -28,7 +28,7 @@ def createSalesRecord():
     update_product_inventory(recordInfo['pid'], False, recordInfo['sales'])
     # 更新商品、店铺销量
     increase_product_sales(recordInfo['pid'], salesCount)
-    increase_shop_sales(request.form.get('sid', '-1'), salesCount)
+    increase_shop_sales(recordInfo['sid'], salesCount)
     return jsonify(status=True, message='succeed', data={'rid': rid})
 
 @sales_controller.route('/shopSalesRecords/<int:sid>', methods=['GET'])
@@ -48,7 +48,7 @@ def salesRecordHandler(pid):
         record = get_record_one_day(pid, rdate)
         if record is None:
             return jsonify(status=False, message='failed', data='')
-        return jsonify(status=True, message='succeed', date=record.serialize())
+        return jsonify(status=True, message='succeed', data=record.serialize())
     # update record info
     elif request.method == 'PUT':
         recordDate = request.json.get('date', date.today().isoformat())
@@ -57,18 +57,28 @@ def salesRecordHandler(pid):
         # 更新记录表
         originRecord = get_record_one_day(pid, recordDate)
         if originRecord is not None:
-            originSalesCount = getSalesCountfromSalesStr(originRecord['sales'])
+            originSalesCount = getSalesCountfromSalesStr(originRecord.sales)
             newSalesCount = getSalesCountfromSalesStr(newSales)
             # 更新各销量
             update_record_sales(pid, recordDate, newSales)
-            increase_shop_sales(originRecord['sid'], newSalesCount - originSalesCount)
+            increase_shop_sales(originRecord.sid, newSalesCount - originSalesCount)
             increase_product_sales(pid, newSalesCount - originSalesCount)
             # 更新商品库存
-            update_product_inventory(pid, True, originRecord['sales'])
+            update_product_inventory(pid, True, originRecord.sales)
             update_product_inventory(pid, False, newSales)
             return jsonify(status=True, message='succeed', data='')
         else:
-            return jsonify(status=False, message='failed', data='')
+            recordInfo = form2Dict(request.json, {'pid': '', 'sid': '', 'pname': '', 'date': date.today().isoformat(), 'sales': ''})
+            recordInfo['date'] = date.fromisoformat(recordInfo['date'])
+            recordInfo['sales'] = json.dumps(ast.literal_eval(recordInfo['sales']))
+            rid = create_new_record(recordInfo)
+            salesCount = getSalesCountfromSalesStr(recordInfo['sales'])
+            # 更新库存
+            update_product_inventory(recordInfo['pid'], False, recordInfo['sales'])
+            # 更新商品、店铺销量
+            increase_product_sales(recordInfo['pid'], salesCount)
+            increase_shop_sales(recordInfo['sid'], salesCount)
+            return jsonify(status=True, message='create new record', data={'rid': rid})
     # delete record
     else:
         recordDate = request.json.get('date', date.today().isoformat())

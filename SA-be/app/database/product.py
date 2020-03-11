@@ -64,9 +64,9 @@ def update_product_inventory(pid, increase, sales):
         for key in sales.keys():
             if key in originTypeInventory.keys():
                 if increase:
-                    originTypeInventory[key] += sales[key]
+                    originTypeInventory[key] += int(sales[key])
                 else:
-                    originTypeInventory[key] -= sales[key]
+                    originTypeInventory[key] -= int(sales[key])
         product.type = json.dumps(originTypeInventory)
         db.session.commit()
         return True
