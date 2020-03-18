@@ -12,14 +12,14 @@
         text-color="#fff"
         active-text-color="#ffd04b">
         <el-menu-item index="/home">首页</el-menu-item>
-        <el-menu-item index="/shops">店铺</el-menu-item>
+        <el-menu-item index="/shops">店铺列表</el-menu-item>
         <el-menu-item index="/salesStatus">销售情况</el-menu-item>
+        <el-menu-item index="/profile">个人中心</el-menu-item>
       </el-menu>
       <div class="user_container">
         <el-dropdown @command="dropdownMenuHandler">
-          <img class="user_avatar" :src="appIcon" />
+          <img class="user_avatar" :src="`/getImg?f=asd123456-shop-158382150436.png&t=${Math.random()}`" />
           <el-dropdown-menu  slot="dropdown">
-            <el-dropdown-item command="profile">个人中心</el-dropdown-item>
             <el-dropdown-item command="logout">退出</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -78,7 +78,9 @@ export default class TopNav extends Vue {
     right: 10px;
     
     .user_avatar {
-      height: 55px;
+      margin-top: 4px;
+      height: 50px;
+      width: 50px;
       border-radius: 50%;
     }
   } 

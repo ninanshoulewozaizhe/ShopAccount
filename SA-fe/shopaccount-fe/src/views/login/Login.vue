@@ -18,6 +18,10 @@
       <el-form-item label="手机号码" prop="phone">
         <el-input v-model="ruleForm.phone"></el-input>
       </el-form-item>
+      <el-form-item label="验证码">
+        <el-input class="Vcode_input"></el-input>
+        <el-button type="primary">发送验证码</el-button>
+      </el-form-item>
       <el-form-item label="密码" prop="password">
         <el-input type="password" v-model="ruleForm.password" autocomplete="off"></el-input>
       </el-form-item>
@@ -221,5 +225,10 @@ export default class Login extends Vue {
 
 .el-input {
   width: 250px;
+}
+
+.Vcode_input {
+  width: 120px;
+  margin-right: 10px;
 }
 </style>

@@ -104,7 +104,6 @@
           </div>
           <div class="sales_statistic_btns_g2" v-else>
             <el-button @click="getSalesDetailfn">返回预览</el-button>
-            <el-button>利润统计</el-button>
           </div>
         </div>
       </div>
@@ -132,15 +131,52 @@
           :picker-options="datePickerOptions"
           @change="datePickerChange">
         </el-date-picker>
-        <ve-line></ve-line>
-      </div>
-      <div class="product_sales_prediect">
-        <h3>销量预测（未来一周）</h3>
-        <ve-line></ve-line>
+          <ve-line :data="chartData"></ve-line>
       </div>
     </div>
     <div class="sales_detail_table" v-else>
-      <el-table></el-table>
+      <h3>销量详细统计</h3>
+      <span>日期选择：</span>
+        <el-date-picker
+          v-model="salesDatePick"
+          type="daterange"
+          align="right"
+          unlink-panels
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          :picker-options="datePickerOptions"
+          @change="datePickerChange">
+        </el-date-picker>
+        <div class="table_container">
+          <el-table 
+            border
+            :data="salesDetailTableData">
+            <el-table-column
+              prop="date"
+              label="日期"
+              sortable
+              fixed
+              align="center"
+              width="180">
+            </el-table-column>
+            <el-table-column v-for="item in Object.keys(product.type)" :key="item"
+            :prop="item"
+            :label="item"
+            align="center"
+            sortable
+            width="120">
+            </el-table-column>
+            <el-table-column
+              prop="salesVolumes"
+              label="总计"
+              sortable
+              fixed="right"
+              align="center"
+              width="150">
+            </el-table-column>
+          </el-table>
+      </div>
     </div>
   </div>
 </template>
@@ -165,7 +201,6 @@ import { SalesRecordItem } from '@/typing/salesStatus/typings';
   },
   async beforeRouteEnter(to: any, from: any, next: any) {
     const pid = to.params.pid;
-    console.log(pid);
     const todayStr = new Date().toISOString().split('T')[0];
     const yesterdayStr = new Date(+new Date() - 1000 * 60 * 60 * 24).toISOString().split('T')[0];
     console.log(todayStr);
@@ -176,15 +211,13 @@ import { SalesRecordItem } from '@/typing/salesStatus/typings';
     const product = store.getters[`product/${GET_CUR_PRODUCT}`];
     const todaySales = store.getters[`salesStatus/${GET_CUR_PRODUCT_TODAY_SALES}`];
     const yesterdaySales = store.getters[`salesStatus/${GET_CUR_PRODUCT_YESTERDAY_SALES}`];
-    console.log(product);
-    console.log(todaySales);
-    console.log(yesterdaySales);
     next((vm: any) => {
       vm.product = JSON.parse(JSON.stringify(product));
       vm.modifyProduct = JSON.parse(JSON.stringify(product));
       vm.salesInit(vm.todaySales, todaySales);
       vm.salesInit(vm.yesterdaySales, yesterdaySales);
       vm.salesInit(vm.updateSales, todaySales);
+      vm.salesDetailTableDataInit(vm.salesDetailRecords);
     });
   }
 })
@@ -205,6 +238,32 @@ export default class ProductDetail extends Vue {
     shop: '',
     type: {}
   };
+
+  chartData = {
+    columns: ['日期', '销量'],
+    rows: [
+      { 日期: '2019-03-14', 销量: 47},
+      { 日期: '2019-03-15', 销量: 50},
+      { 日期: '2019-03-16', 销量: 47},
+      { 日期: '2019-03-17', 销量: 70},
+      { 日期: '2019-03-18', 销量: 52}
+    ]
+  };
+
+  salesDetailRecords: SalesRecordItem[] = [
+    {id: 11, name: '', pid: 3, sid: 1, date: '2020-03-14',
+    sales: '{"L": 4, "M": 12, "S": 6, "XL": 13, "XXL": 12}', salesVolumes: 47},
+    {id: 12, name: '', pid: 3, sid: 1, date: '2020-03-15',
+    sales: '{"L": 12, "M": 8, "S": 6, "XL": 13, "XXL": 11}', salesVolumes: 50},
+    {id: 13, name: '', pid: 3, sid: 1, date: '2020-03-16',
+    sales: '{"L": 10, "M": 12, "S": 14, "XL": 11, "XXL": 0}', salesVolumes: 47},
+    {id: 14, name: '', pid: 3, sid: 1, date: '2020-03-17',
+    sales: '{"L": 12, "M": 32, "S": 14, "XL": 0, "XXL": 12}', salesVolumes: 70},
+    {id: 15, name: '', pid: 3, sid: 1, date: '2020-03-18',
+    sales: '{"L": 13, "M": 12, "S": 15, "XL": 12, "XXL": 0}', salesVolumes: 52}
+  ];
+
+  salesDetailTableData: any = [];
 
   modifyProduct: IProductDetailItem = JSON.parse(JSON.stringify(this.product));
   PNewType = '';
@@ -245,7 +304,6 @@ export default class ProductDetail extends Vue {
   updateSales: IndexStingOJ = {};
 
   salesInit(obj: any, data: SalesRecordItem | null) {
-    console.log(data);
     if (data && data.sales) {
       if (typeof data.sales === 'string') {
         const sales = JSON.parse(data.sales);
@@ -262,7 +320,19 @@ export default class ProductDetail extends Vue {
         }
       }
     }
-    console.log(obj);
+  }
+
+  salesDetailTableDataInit(salesRecords: SalesRecordItem[]) {
+    console.log(salesRecords);
+    for (const item of salesRecords) {
+      if (typeof item.sales === 'string') {
+        const data = JSON.parse(item.sales);
+        data.date = item.date;
+        data.salesVolumes = item.salesVolumes;
+        this.salesDetailTableData.push(data);
+      }
+    }
+    console.log(this.salesDetailTableData);
   }
 
   get HtableDatashow() {
@@ -271,7 +341,6 @@ export default class ProductDetail extends Vue {
       today: this.todaySales  || {},
       yesterday: this.yesterdaySales || {}
     };
-    console.log(data);
     return data[this.recentSalesShow];
   }
 
@@ -563,6 +632,13 @@ export default class ProductDetail extends Vue {
 
   .sales_table {
     margin-top: 10px;
+  }
+}
+
+.sales_detail_table {
+  .table_container {
+    margin-top: 20px;
+    width: 900px;
   }
 }
 </style>

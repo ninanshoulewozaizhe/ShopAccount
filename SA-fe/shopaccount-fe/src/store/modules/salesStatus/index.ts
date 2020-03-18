@@ -41,6 +41,7 @@ export default {
           commit(MODIFY_CUR_SHOP_TODAY_SALES, data.data);
           return Promise.resolve('OK');
         } else {
+          commit(MODIFY_CUR_SHOP_TODAY_SALES, []);
           return Promise.resolve(data.message);
         }
       } catch (error) {
@@ -57,6 +58,7 @@ export default {
           commit(MODIFY_CUR_PRODUCT_TODAY_SALES, data.data);
           return Promise.resolve('OK');
         } else {
+          commit(MODIFY_CUR_PRODUCT_TODAY_SALES, null);
           return Promise.resolve(data.message);
         }
       } catch (error) {
@@ -73,6 +75,7 @@ export default {
           commit(MODIFY_CUR_PRODUCT_YESTERDAY_SALES, data.data);
           return Promise.resolve('OK');
         } else {
+          commit(MODIFY_CUR_PRODUCT_YESTERDAY_SALES, null);
           return Promise.resolve(data.message);
         }
       } catch (error) {
@@ -119,6 +122,7 @@ export default {
           commit(MODIFY_CUR_SHOP_PEROID_SALES, data.data);
           return Promise.resolve('OK');
         } else {
+          commit(MODIFY_CUR_SHOP_PEROID_SALES, []);
           return Promise.resolve(data.message);
         }
       } catch (error) {

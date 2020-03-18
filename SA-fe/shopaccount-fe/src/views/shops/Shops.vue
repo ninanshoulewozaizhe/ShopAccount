@@ -178,7 +178,7 @@ export default class Shops extends Vue {
     const isJPGorPNG = file.type === 'image/jpeg' || file.type === 'image/png';
     const isLt10M = file.size / 1024 / 1024 < 10;
     if (!isJPGorPNG) {
-      this.$message.error('请上传图片类型的文件');
+      this.$message.error('请上传jpg或png图片类型的文件');
       return false;
     }
     if (!isLt10M) {
