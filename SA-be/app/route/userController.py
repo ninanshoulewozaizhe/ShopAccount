@@ -85,7 +85,7 @@ def updateUserImg():
     imgPrefix = username
     imgName = imgSave(img, imgPrefix)
     originImg = get_uImg_by_username(username)
-    if originImg is not None:
+    if originImg is not None and originImg != 'default-user.jpg':
         originImgPath = os.path.join(app.instance_path, r'app\static\images', originImg)
         os.remove(originImgPath)
     update_user_img(username, imgName)

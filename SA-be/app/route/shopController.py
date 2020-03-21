@@ -21,7 +21,7 @@ shop_controller.before_request(user_session_check)
 def createShop():
     username = session.get('username')
     uid = get_uid_by_username(username)
-    shopInfo = form2Dict(request.json, {'name': '', 'description': '', 'img': '', 'uid': uid})
+    shopInfo = form2Dict(request.json, {'name': '', 'description': '', 'img': 'default-shop.jpeg', 'uid': uid})
     logger.info(f'user: {username} try to create shop:{shopInfo}')
     sid = create_shop(shopInfo)
     logger.info(f'shop-id: {sid} created')
@@ -98,7 +98,7 @@ def updateShopImg(sid):
     imgName = imgSave(img, imgPrefix)
     shop = get_shop_detail(sid)
     originImg = shop.img
-    if originImg is not None:
+    if originImg is not None and originImg != 'default-shop.jpeg':
         originImgPath = os.path.join(app.instance_path, r'app\static\images', originImg)
         os.remove(originImgPath)
     update_shop_img(sid, imgName)

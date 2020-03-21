@@ -1,9 +1,13 @@
 import { Module } from 'vuex';
-import { State, IUserInfo } from './typings';
+import { State } from './typings';
 import {
   CURRENT_USER_INFO,
   LOAD_USER_PROFILE,
   MODIFY_USER_PROFILE,
+  MODIFY_USER_IMG,
+  MODIFY_USER_PHONE,
+  UPADTE_USER_PASSWORD,
+  UPADTE_USER_PHONE,
   CHECK_USERNAME_EXIST,
   CHECK_PHONE_EXIST,
   IS_LOGIN,
@@ -15,6 +19,7 @@ import {
 import { httpRequestSilence } from '@/utils/httpRequest';
 import { IResponse } from '@/typing/vuex/typings';
 import { SignUpForm, LoginForm } from '@/typing/login/typings';
+import { ChangePdForm, UserInfo } from '@/typing/profile/typings';
 
 export default {
   namespaced: true,
@@ -93,7 +98,7 @@ export default {
       // noop
       try {
         const { data } = await httpRequestSilence.get<
-        IResponse<IUserInfo, {}>
+        IResponse<UserInfo, {}>
         >(`/login`);
         if (data.status) {
           commit(MODIFY_USER_PROFILE, data.data);
@@ -105,27 +110,48 @@ export default {
         return Promise.resolve(error);
       }
     },
-    async [MODIFY_USER_PROFILE]({commit}, payload) {
+    async [UPADTE_USER_PHONE]({ commit }, payload: string) {
       try {
         const { data } = await httpRequestSilence.put<
-        IResponse<{}, {}>
-        >(`/user`, payload);
+          IResponse<{}> >(`/userPhone`, {
+            phone: payload
+          });
         if (data.status) {
-          commit(MODIFY_USER_PROFILE, payload);
-          return data;
+          commit(MODIFY_USER_PHONE, payload);
+          return Promise.resolve('OK');
+        } else {
+          return Promise.resolve(data.message);
         }
       } catch (error) {
-        return error.data;
+        return Promise.resolve(error);
+      }
+    },
+    async [UPADTE_USER_PASSWORD]({ commit }, payload: ChangePdForm) {
+      try {
+        const { data } = await httpRequestSilence.put<
+          IResponse<{}> >(`/userPassword`, payload);
+        if (data.status) {
+          return Promise.resolve('OK');
+        } else {
+          return Promise.resolve(data.message);
+        }
+      } catch (error) {
+        return Promise.resolve(error);
       }
     }
   },
   mutations: {
-    [MODIFY_USER_PROFILE](state, payload: IUserInfo) {
+    [MODIFY_USER_PHONE](state, payload: string) {
+      if (state.user) {
+        state.user.phone = payload;
+      }
+    },
+    [MODIFY_USER_PROFILE](state, payload: UserInfo) {
       state.user = payload;
     }
   },
   getters: {
-    [CURRENT_USER_INFO](state): IUserInfo | null {
+    [CURRENT_USER_INFO](state): UserInfo | null {
       return state.user;
     },
     [IS_LOGIN](state): boolean {

@@ -1,9 +1,5 @@
-export interface State {
-    user: IUserInfo | null;
-}
+import { UserInfo } from '@/typing/profile/typings';
 
-export interface IUserInfo {
-    id: number;
-    username: string;
-    email: string;
+export interface State {
+    user: UserInfo | null;
 }

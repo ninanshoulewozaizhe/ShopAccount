@@ -12,6 +12,8 @@ from app.log import logger
 from datetime import date
 import json
 import ast
+import os
+from app import app
 from app.route.requestHandler import user_session_check
 
 product_controller = Blueprint('product_controller', __name__)
@@ -21,7 +23,7 @@ product_controller.before_request(user_session_check)
 @product_controller.route('/createProduct', methods=['POST'])
 def createProduct():
     productInfo = form2Dict(request.json, {'name': '', 'status':'on-sale', 'description': '', \
-        'img': '', 'sid': '-1', 'shop': '', 'type':'', 'salesVolumes': 0})
+        'img': 'default-product.png', 'sid': '-1', 'shop': '', 'type':'', 'salesVolumes': 0})
     productInfo['type'] = json.dumps(ast.literal_eval(productInfo['type']))
     pid = create_product(productInfo)
     increase_shop_product_amount(productInfo['sid'], 1)
@@ -95,7 +97,7 @@ def updateProductImg(pid):
     imgName = imgSave(img, imgPrefix)
     product = get_product_detail_by_pid(pid)
     originImg = product.img
-    if originImg is not None:
+    if originImg is not None and originImg != 'default-product.png':
         originImgPath = os.path.join(app.instance_path, r'app\static\images', originImg)
         os.remove(originImgPath)
     update_product_img(pid, imgName)

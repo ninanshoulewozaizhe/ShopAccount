@@ -14,7 +14,7 @@ def create_user(userInfo):
     logger.info(f'{exist}')
     hash_pd = hashlib.sha256(userInfo['password'].encode("utf-8")).hexdigest() 
     logger.info(f"origin: {userInfo['password']}, hashl:{hash_pd}")
-    new_user = User(username=userInfo['username'], password=hash_pd, phone=userInfo['phone'])
+    new_user = User(username=userInfo['username'], password=hash_pd, phone=userInfo['phone'], img='default-user.jpg')
     db.session.add(new_user)
     db.session.flush()
     uid = new_user.id
