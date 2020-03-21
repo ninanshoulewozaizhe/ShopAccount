@@ -10,3 +10,8 @@ export interface ChangePdForm {
     n_password: string;
     n_confirmPd?: string;
 }
+
+
+export interface ChangePhoneForm {
+    phone: string;
+}

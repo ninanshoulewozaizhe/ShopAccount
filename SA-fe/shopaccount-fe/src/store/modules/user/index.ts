@@ -19,7 +19,7 @@ import {
 import { httpRequestSilence } from '@/utils/httpRequest';
 import { IResponse } from '@/typing/vuex/typings';
 import { SignUpForm, LoginForm } from '@/typing/login/typings';
-import { ChangePdForm, UserInfo } from '@/typing/profile/typings';
+import { ChangePdForm, UserInfo, ChangePhoneForm } from '@/typing/profile/typings';
 
 export default {
   namespaced: true,
@@ -110,12 +110,10 @@ export default {
         return Promise.resolve(error);
       }
     },
-    async [UPADTE_USER_PHONE]({ commit }, payload: string) {
+    async [UPADTE_USER_PHONE]({ commit }, payload: ChangePhoneForm) {
       try {
         const { data } = await httpRequestSilence.put<
-          IResponse<{}> >(`/userPhone`, {
-            phone: payload
-          });
+          IResponse<{}> >(`/userPhone`, payload);
         if (data.status) {
           commit(MODIFY_USER_PHONE, payload);
           return Promise.resolve('OK');

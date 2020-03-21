@@ -100,29 +100,30 @@ export default class Login extends Vue {
       }
     } else {
       const ruleForm: any = this.$refs.ruleForm;
-      ruleForm.validate(this.formValidate);
-      if (!this.formState) {
-        this.$notify.error({
-          title: '注册失败',
-          message: '请填好注册信息'
-        });
-        return;
-      }
-      const fields = Object.freeze({ ...this.ruleForm });
-      const result = await this.$store.dispatch(`user/${SIGNUP}`, fields);
-      if (result !== 'OK') {
-        this.$notify.error({
-          title: '注册失败',
-          message: '请稍后重试'
-        });
-      } else {
-        this.$notify({
-            title: '注册成功',
-            message: '恭喜成为本站成员',
-            type: 'success'
-        });
-        this.register();
-      }
+      ruleForm.validate(async (success) => {
+        if (!success) {
+          this.$notify.error({
+            title: '注册失败',
+            message: '请填好注册信息'
+          });
+        } else {
+          const fields = Object.freeze({ ...this.ruleForm });
+          const result = await this.$store.dispatch(`user/${SIGNUP}`, fields);
+          if (result !== 'OK') {
+            this.$notify.error({
+              title: '注册失败',
+              message: '请稍后重试'
+            });
+          } else {
+            this.$notify({
+              title: '注册成功',
+              message: '恭喜成为本站成员',
+              type: 'success'
+            });
+            this.register();
+          }
+        }
+      });
     }
   }
 
