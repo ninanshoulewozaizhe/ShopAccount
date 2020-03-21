@@ -15,5 +15,6 @@ export const UPADTE_USER_PASSWORD = 'UPADTE_USER_PASSWORD';
 
 // getters
 export const UID = 'UID';
+export const UIMG = 'UIMG';
 export const CURRENT_USER_INFO = 'CURRENT_USER_INFO';
 export const IS_LOGIN = 'IS_LOGIN';

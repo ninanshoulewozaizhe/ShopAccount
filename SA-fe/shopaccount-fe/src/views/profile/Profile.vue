@@ -63,12 +63,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Emit } from 'vue-property-decorator';
 import AppIcon from '../../../public/images/accountBook.jpg';
 import { UserInfo, ChangePdForm, ChangePhoneForm } from '@/typing/profile/typings';
 import store from '@/store';
-import { CURRENT_USER_INFO, LOAD_USER_PROFILE, CHECK_PHONE_EXIST } from '@/store/modules/user/constants';
-import { UPADTE_USER_PHONE, UPADTE_USER_PASSWORD } from '../../store/modules/user/constants';
+import { CURRENT_USER_INFO, LOAD_USER_PROFILE,
+  CHECK_PHONE_EXIST, MODIFY_USER_IMG,
+  UPADTE_USER_PHONE, UPADTE_USER_PASSWORD } from '@/store/modules/user/constants';
 
 @Component({
   name: 'profile',
@@ -171,9 +172,11 @@ export default class Profile extends Vue {
     return isJPGorPNG && isLt10M;
   }
 
+  @Emit('updateAvatar')
   avatarUploadSuccess(res: any) {
     console.log(res);
     this.user.img = res.data;
+    this.$store.commit(`user/${MODIFY_USER_IMG}`, res.data);
     console.log(this.user.img);
     this.$message.success('头像更换成功');
   }

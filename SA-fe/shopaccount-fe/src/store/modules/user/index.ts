@@ -14,7 +14,8 @@ import {
   LOGIN,
   LOGOUT,
   SIGNUP,
-  UID
+  UID,
+  UIMG
 } from './constants';
 import { httpRequestSilence } from '@/utils/httpRequest';
 import { IResponse } from '@/typing/vuex/typings';
@@ -144,6 +145,11 @@ export default {
         state.user.phone = payload;
       }
     },
+    [MODIFY_USER_IMG](state, payload: string) {
+      if (state.user) {
+        state.user.img = payload;
+      }
+    },
     [MODIFY_USER_PROFILE](state, payload: UserInfo) {
       state.user = payload;
     }
@@ -157,6 +163,9 @@ export default {
     },
     [UID](state): number | null {
       return state.user && state.user.id;
+    },
+    [UIMG](state): string {
+      return (state.user && state.user.img) || 'default-user.jpg';
     }
   }
 } as Module<State, any>;
