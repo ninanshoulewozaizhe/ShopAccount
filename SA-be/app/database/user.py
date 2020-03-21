@@ -49,13 +49,26 @@ def user_verification(userInfo):
         else:
             return False, None
 
-def update_user_info(newInfo):
-    user = User.query.filter_by(username=newInfo['username']).first()
-    user.password = hashlib.sha256(newInfo['password'].encode("utf-8")).hexdigest()
-    user.phone = newInfo['phone']
+def update_user_password(username, password):
+    user = User.query.filter_by(username=username).first()
+    user.password = hashlib.sha256(password.encode("utf-8")).hexdigest()
+    db.session.commit()
+
+def update_user_phone(username, phone):
+    user = User.query.filter_by(username=username).first()
+    user.phone = phone
+    db.session.commit()
+
+def update_user_img(username, img):
+    user = User.query.filter_by(username=username).first()
+    user.img = img
     db.session.commit()
 
 def get_uid_by_username(username):
    user = User.query.filter_by(username=username).first()
    return user.id
+
+def get_uImg_by_username(username):
+   user = User.query.filter_by(username=username).first()
+   return user.img
 

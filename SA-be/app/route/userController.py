@@ -1,10 +1,13 @@
 from flask import Blueprint, request, jsonify, session
 from app.database.user import create_user, username_exist, phone_exist, \
-    user_verification, update_user_info, get_uid_by_username
+    user_verification, get_uid_by_username, update_user_password, \
+    update_user_phone, update_user_img, get_uImg_by_username
 from app.utils import form2Dict, getSalesCountfromSalesStr, imgSave
 from app.log import logger
 from datetime import date
 import json
+from app import app
+import os
 
 user_controller = Blueprint('user_controller', __name__)
 
@@ -71,14 +74,57 @@ def checkPhone():
         return jsonify(status=True, message="phone available", data='')
 
 @user_controller.route('/userImg', methods=['POST', 'PUT'])
-def uploadUserImg():
+def updateUserImg():
+    if 'username' not in session:
+        logger.warning('user not login')
+        return jsonify(status=False, message='user not login', data='')
+    username = session.get('username')
     img = request.files['file']
     if img is None:
         return jsonify(status=False, message="img not existed", data='')
-    username = session.get('username')
-    imgName = f'{username}.png'
-    imgSave(img, imgName)
+    imgPrefix = username
+    imgName = imgSave(img, imgPrefix)
+    originImg = get_uImg_by_username(username)
+    if originImg is not None:
+        originImgPath = os.path.join(app.instance_path, r'app\static\images', originImg)
+        os.remove(originImgPath)
+    update_user_img(username, imgName)
     return jsonify(status=True, message="img upload succeed", data=imgName)
+
+@user_controller.route('/userPhone', methods=['PUT'])
+def updateUserPhone():
+    if 'username' not in session:
+        logger.warning('user not login')
+        return jsonify(status=False, message='user not login', data='')
+    username = session.get('username')
+    logger.info(f'{username} update phone')
+    phone = request.json.get('phone', '')
+    exist = phone_exist(phone)
+    if exist[0]:
+        logger.warning('update failed, phone has existed')
+        return jsonify(status=False, message="phone has existed", data='')
+    else:
+        update_user_phone(username, phone)
+        logger.warning('update succeed')
+        return jsonify(status=True, message="phone update succeed", data='')
+
+@user_controller.route('/userPassword', methods=['PUT'])
+def updateUserPassword():
+    if 'username' not in session:
+        logger.warning('user not login')
+        return jsonify(status=False, message='user not login', data='')
+    username = session.get('username')
+    logger.info(f'{username} update password')
+    oPassword = request.json.get('o_password', '')
+    pdConfirm = user_verification({'username': username, 'password': oPassword})
+    if not pdConfirm[0]:
+        logger.warning('update failed, origin password wrong')
+        return jsonify(status=False, message="origin password wrong", data='')
+    else:
+        nPassword = request.json.get('n_password', '')
+        update_user_password(username, nPassword)
+        logger.info('update succeed')
+        return jsonify(status=True, message="password update succeed", data='')
 
 @user_controller.route('/logout', methods=['PUT'])
 def logout():

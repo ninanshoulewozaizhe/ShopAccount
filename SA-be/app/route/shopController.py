@@ -97,9 +97,10 @@ def updateShopImg(sid):
     imgPrefix = username + '-shop'
     imgName = imgSave(img, imgPrefix)
     shop = get_shop_detail(sid)
-    originImg = shop['img']
-    originImgPath = os.path.join(app.instance_path, r'app\static\images', originImg)
-    os.remove(originImgPath)
+    originImg = shop.img
+    if originImg is not None:
+        originImgPath = os.path.join(app.instance_path, r'app\static\images', originImg)
+        os.remove(originImgPath)
     update_shop_img(sid, imgName)
     return jsonify(status=True, message="img upload succeed", data=imgName)
 

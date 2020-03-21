@@ -87,7 +87,19 @@ def productHandler(pid):
         
 @product_controller.route('/productImg/<int:pid>', methods=['PUT'])
 def updateProductImg(pid):
-    pass
+    img = request.files['file']
+    if img is None:
+        return jsonify(status=False, message="img not existed", data='')
+    username = session.get('username')
+    imgPrefix = username + '-product'
+    imgName = imgSave(img, imgPrefix)
+    product = get_product_detail_by_pid(pid)
+    originImg = product.img
+    if originImg is not None:
+        originImgPath = os.path.join(app.instance_path, r'app\static\images', originImg)
+        os.remove(originImgPath)
+    update_product_img(pid, imgName)
+    return jsonify(status=True, message="img upload succeed", data=imgName)
 
 @product_controller.route('/productImg', methods=['POST'])
 def uploadProductImg():
