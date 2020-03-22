@@ -97,3 +97,7 @@ def delete_products_by_sid(sid):
     db.session.commit()
     return True
 
+def get_product_sales_rank(sids, count):
+    products = Product.query.filter(Product.sid.in_(sids)) \
+        .order_by(Product.salesVolumes).limit(count).all()
+    return products

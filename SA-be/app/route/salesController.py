@@ -2,10 +2,10 @@ from flask import Blueprint, request, jsonify, session
 from app.database.models import User, Product, Shop, SalesVolumes
 from app.database.user import get_uid_by_username
 from app.database.product import increase_product_sales, update_product_inventory
-from app.database.shop import increase_shop_sales
+from app.database.shop import increase_shop_sales, get_user_all_shops
 from app.database.salesVolumes import create_new_record, get_record_one_day, \
     get_records_by_period, update_record_sales, delete_records_by_date, \
-    delete_record, get_shop_records_one_day    
+    delete_record, get_shop_records_one_day, get_shop_records_by_period    
 from app.utils import form2Dict, getSalesCountfromSalesStr
 from app.log import logger
 from datetime import date
@@ -100,6 +100,33 @@ def salesRecordHandler(pid):
 def getSalesRecordPeriod(pid):
     dateFrom = request.args.get('from', date.today().isoformat())
     dateTo = request.args.get('to', date.today().isoformat())
+    logger.info(f'get product {pid} records from:{dateFrom}, to :{dateTo}')
     records = get_records_by_period(pid, date.fromisoformat(dateFrom), date.fromisoformat(dateTo))
     records = SalesVolumes.serialize_list(records)
-    return jsonify(status=True, message='succeed', data='')
+    return jsonify(status=True, message='succeed', data=records)
+
+@sales_controller.route('/shopSalesPeriod/<int:sid>', methods=['GET'])
+def getShopSalesRecordPeriod(sid):
+    dateFrom = request.args.get('from', date.today().isoformat())
+    dateTo = request.args.get('to', date.today().isoformat())
+    logger.info(f'get product {sid} records from:{dateFrom}, to :{dateTo}')
+    records = get_shop_records_by_period(sid, date.fromisoformat(dateFrom), date.fromisoformat(dateTo))
+    records = SalesVolumes.serialize_list(records)
+    return jsonify(status=True, message='succeed', data=records)
+
+@sales_controller.route('/allShopsSalesOneDay', methods=['GET'])
+def getAllshopsSalesOneDay():
+    rdate = request.args.get('date', date.today().isoformat())
+    rdate = date.fromisoformat(rdate)
+    username = session.get('username')
+    uid = get_uid_by_username(username)
+    shops = get_user_all_shops(uid)
+    result = {}
+    for shop in shops:
+        records = get_shop_records_one_day(shop.id, rdate)
+        records = SalesVolumes.serialize_list(records)
+        result[shop.name] = records
+    return jsonify(status=True, message='succeed', data=result)
+
+    
+        

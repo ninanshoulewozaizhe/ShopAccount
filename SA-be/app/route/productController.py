@@ -4,7 +4,7 @@ from app.database.user import get_uid_by_username
 from app.database.product import create_product, get_preview_prodcuts_by_sid, \
     get_all_products_by_sid, update_product_info, update_product_img, \
     update_product_sales, increase_product_sales, delete_product_by_pid, \
-    delete_products_by_sid, get_product_detail_by_pid
+    delete_products_by_sid, get_product_detail_by_pid, get_product_sales_rank
 from app.database.shop import increase_shop_product_amount, get_user_all_shops
 from app.database.salesVolumes import delete_records_by_pid
 from app.utils import form2Dict, getSalesCountfromSalesStr, imgSave
@@ -112,3 +112,14 @@ def uploadProductImg():
     imgPrefix = username + '-product'
     imgName = imgSave(img, imgPrefix)
     return jsonify(status=True, message="img upload succeed", data=imgName)
+
+@product_controller.route('/productSalesRank', methods=['GET'])
+def getProductSalesRank():
+    username = session.get('username')
+    uid = get_uid_by_username(username)
+    shops = get_user_all_shops(uid)
+    sids = [shop.sid for shop in shops]
+    count = request.args.get('count', '10')
+    products = get_product_sales_rank(sids, count)
+    products = Product.serialize_list(products)
+    return jsonify(status=True, message="succeed", data=products)
