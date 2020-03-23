@@ -10,7 +10,6 @@ export interface SalesRecordItem {
     salesVolumes?: number;
 }
 
-export interface OneDaySalesItem {
-    date: string;
-    sales: IndexOJ;
+export interface ShopsSalesItem {
+    [index: string]: SalesRecordItem[];
 }
