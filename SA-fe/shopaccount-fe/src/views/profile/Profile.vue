@@ -3,7 +3,7 @@
     <h3>个人中心</h3>
     <div class="info_container">
       <div class="img_container">
-        <img  class="avatar" :src="`/getImg?f=${user.img}&t=${Math.random()}`" alt="avatar">
+        <img  class="avatar" :src="`/getImg?f=${user.img}`" alt="avatar">
         <el-upload
           class="avatar-uploader"
           action="/userImg"
@@ -228,7 +228,7 @@ export default class Profile extends Vue {
   async submitUpdatePassword() {
     const passwordForm: any = this.$refs.passwordForm;
     console.log(passwordForm);
-    await passwordForm.validate(async (success) => {
+    await passwordForm.validate(async (success: boolean) => {
       if (!success) {
         this.$notify.error({
           title: '提交失败',
@@ -285,5 +285,10 @@ export default class Profile extends Vue {
   }
 }
 
+.info_dialog {
+  .el-input {
+    width: 250px;
+  }
+}
 
 </style>

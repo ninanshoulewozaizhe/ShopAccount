@@ -29,7 +29,7 @@ export default class BasicLayout extends Vue {
 
   userImg = '';
 
-  amouted() {
+  mounted() {
     this.getUserImg();
   }
 
@@ -40,6 +40,7 @@ export default class BasicLayout extends Vue {
   getUserImg() {
     const userImg = store.getters[`user/${UIMG}`];
     this.userImg = userImg;
+    console.log(this.userImg);
   }
 }
 </script>

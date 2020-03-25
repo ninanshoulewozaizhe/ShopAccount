@@ -18,7 +18,7 @@
       </el-menu>
       <div class="user_container">
         <el-dropdown @command="dropdownMenuHandler">
-          <img class="user_avatar" :src="`/getImg?f=${image}&t=${Math.random()}`" @click="getProfile" />
+          <img class="user_avatar" :src="`/getImg?f=${image}`" @click="getProfile" />
           <el-dropdown-menu  slot="dropdown">
             <el-dropdown-item command="logout">退出</el-dropdown-item>
           </el-dropdown-menu>
@@ -36,7 +36,7 @@ import { LOGOUT } from '@/store/modules/user/constants';
   name: 'topNav'
 })
 export default class TopNav extends Vue {
-  @Prop({ default: 'default-user.jpg' }) readonly image: string;
+  @Prop({ default: 'default-user.jpg' }) readonly image!: string;
 
   appIcon = AppIcon;
 

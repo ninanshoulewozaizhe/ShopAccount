@@ -30,3 +30,12 @@ export interface IProductSalesItem {
     amount: number;
     disable?: boolean;
 }
+
+export interface ProductSalesChartData {
+    columns: string[];
+    rows: SalesChartRowItem[];
+}
+export interface SalesChartRowItem {
+    日期: string;
+    销量: number;
+}

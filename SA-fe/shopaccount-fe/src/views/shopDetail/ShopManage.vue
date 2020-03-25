@@ -2,7 +2,7 @@
   <div>
     <h3>店铺管理</h3>
     <div class="s_info_container">
-      <img class="s_img" :src="`/getImg?f=${shop.img}&t=${Math.random()}`" alt="s_img">
+      <img class="s_img" :src="`/getImg?f=${shop.img}`" alt="s_img">
       <div class="s_info">
         <div>
           <div class="s_name">{{ shop.name }}</div>
@@ -23,7 +23,7 @@
                   :show-file-list="false"
                   :on-success="shopAvatarUploadSuccess"
                   :before-upload="beforeAvatarUpload">
-                  <img v-if="modifyShop.img" :src="`/getImg?f=${modifyShop.img}&t=${Math.random()}`" class="avatar">
+                  <img v-if="modifyShop.img" :src="`/getImg?f=${modifyShop.img}`" class="avatar">
                   <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
                 <el-form>
@@ -56,7 +56,7 @@
                   :show-file-list="false"
                   :on-success="productAvatarUploadSuccess"
                   :before-upload="beforeAvatarUpload">
-                  <img v-if="newProduct.img" :src="`/getImg?f=${newProduct.img}&t=${Math.random()}`" class="avatar">
+                  <img v-if="newProduct.img" :src="`/getImg?f=${newProduct.img}`" class="avatar">
                   <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
                 <el-form>

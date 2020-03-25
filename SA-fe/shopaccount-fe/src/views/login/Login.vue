@@ -100,7 +100,7 @@ export default class Login extends Vue {
       }
     } else {
       const ruleForm: any = this.$refs.ruleForm;
-      ruleForm.validate(async (success) => {
+      ruleForm.validate(async (success: boolean) => {
         if (!success) {
           this.$notify.error({
             title: '注册失败',

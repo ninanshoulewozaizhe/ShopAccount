@@ -2,7 +2,7 @@
   <div>
     <h3>商品详情</h3>
     <div class="p_info_container">
-      <img class="p_img" v-if="product.img" :src="`/getImg?f=${product.img}&t=${Math.random()}`" alt="p_img">
+      <img class="p_img" v-if="product.img" :src="`/getImg?f=${product.img}`" alt="p_img">
       <div class="p_info">
         <div>
           <div class="p_name">{{ product.name }}</div>
@@ -22,7 +22,7 @@
                   :show-file-list="false"
                   :on-success="imgUploadSuccess"
                   :before-upload="beforeImgUpload">
-                  <img v-if="modifyProduct.img" :src="`/getImg?f=${modifyProduct.img}&t=${Math.random()}`" class="p_info_img">
+                  <img v-if="modifyProduct.img" :src="`/getImg?f=${modifyProduct.img}`" class="p_info_img">
                   <i v-else class="el-icon-plus img-uploader-icon"></i>
                 </el-upload>
                 <el-form>
@@ -184,13 +184,15 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import horizontalSaleTable from '@/components/productDetail/horizontalSaleTable.vue';
-import { IProductDetailItem, ISuggestObj, IProductSalesItem, IndexStingOJ, IndexOJ } from '@/typing/productDetail/typings';
+import { IProductDetailItem, ISuggestObj, IProductSalesItem,
+  IndexStingOJ, IndexOJ, SalesChartRowItem, ProductSalesChartData } from '@/typing/productDetail/typings';
 import store from '@/store';
 import { LOAD_CUR_PRODUCT, GET_CUR_PRODUCT, UPDATE_PRODUCT } from '@/store/modules/product/constants';
 import { LOAD_CUR_PRODUCT_TODAY_SALES, LOAD_CUR_PRODUCT_YESTERDAY_SALES,
   GET_CUR_PRODUCT_TODAY_SALES, GET_CUR_PRODUCT_YESTERDAY_SALES,
   GET_PRODUCT_ONE_DAY_SALES, MODIFY_PRODUCT_ONE_DAY_SALES,
-  LOAD_PRODUCT_ONE_DAY_SALES, UPDATE_PRODUCT_ONE_DAY_SALES
+  LOAD_PRODUCT_ONE_DAY_SALES, UPDATE_PRODUCT_ONE_DAY_SALES,
+  LOAD_PRODUCT_PERIOD_SALES, GET_PRODUCT_PERIOD_SALES
   } from '@/store/modules/salesStatus/constants';
 import { SalesRecordItem } from '@/typing/salesStatus/typings';
 
@@ -203,17 +205,22 @@ import { SalesRecordItem } from '@/typing/salesStatus/typings';
     const pid = to.params.pid;
     const todayStr = new Date().toISOString().split('T')[0];
     const yesterdayStr = new Date(+new Date() - 1000 * 60 * 60 * 24).toISOString().split('T')[0];
+    const weekAgoStr = new Date(+new Date() - 3600 * 1000 * 24 * 6).toISOString().split('T')[0];
     console.log(todayStr);
-    console.log(yesterdayStr);
+    console.log(weekAgoStr);
     await store.dispatch(`product/${LOAD_CUR_PRODUCT}`, pid);
     await store.dispatch(`salesStatus/${LOAD_CUR_PRODUCT_TODAY_SALES}`, {pid, date: todayStr});
     await store.dispatch(`salesStatus/${LOAD_CUR_PRODUCT_YESTERDAY_SALES}`, {pid, date: yesterdayStr});
+    await store.dispatch(`salesStatus/${LOAD_PRODUCT_PERIOD_SALES}`, {pid, from: weekAgoStr, to: todayStr});
     const product = store.getters[`product/${GET_CUR_PRODUCT}`];
     const todaySales = store.getters[`salesStatus/${GET_CUR_PRODUCT_TODAY_SALES}`];
     const yesterdaySales = store.getters[`salesStatus/${GET_CUR_PRODUCT_YESTERDAY_SALES}`];
+    const chartRowRawData = store.getters[`salesStatus/${GET_PRODUCT_PERIOD_SALES}`];
+    console.log(chartRowRawData);
     next((vm: any) => {
       vm.product = JSON.parse(JSON.stringify(product));
       vm.modifyProduct = JSON.parse(JSON.stringify(product));
+      vm.chartDataInit(chartRowRawData, new Date(+new Date() - 3600 * 1000 * 24 * 6), new Date());
       vm.salesInit(vm.todaySales, todaySales);
       vm.salesInit(vm.yesterdaySales, yesterdaySales);
       vm.salesInit(vm.updateSales, todaySales);
@@ -239,15 +246,11 @@ export default class ProductDetail extends Vue {
     type: {}
   };
 
-  chartData = {
+ chartRowRawData: SalesRecordItem[] = [];
+
+  chartData: ProductSalesChartData = {
     columns: ['日期', '销量'],
-    rows: [
-      { 日期: '2019-03-14', 销量: 47},
-      { 日期: '2019-03-15', 销量: 50},
-      { 日期: '2019-03-16', 销量: 47},
-      { 日期: '2019-03-17', 销量: 70},
-      { 日期: '2019-03-18', 销量: 52}
-    ]
+    rows: []
   };
 
   salesDetailRecords: SalesRecordItem[] = [
@@ -277,7 +280,7 @@ export default class ProductDetail extends Vue {
       onClick(picker: any) {
         const end = new Date();
         const start = new Date();
-        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+        start.setTime(start.getTime() - 3600 * 1000 * 24 * 6);
         picker.$emit('pick', [start, end]);
       }
     }, {
@@ -323,7 +326,6 @@ export default class ProductDetail extends Vue {
   }
 
   salesDetailTableDataInit(salesRecords: SalesRecordItem[]) {
-    console.log(salesRecords);
     for (const item of salesRecords) {
       if (typeof item.sales === 'string') {
         const data = JSON.parse(item.sales);
@@ -332,7 +334,42 @@ export default class ProductDetail extends Vue {
         this.salesDetailTableData.push(data);
       }
     }
-    console.log(this.salesDetailTableData);
+  }
+
+  chartDataInit(rowRawData: SalesRecordItem[], from: Date, to: Date) {
+    const datePeriodObj: SalesChartRowItem[] = this.datePeriodObjInit(from, to);
+    for (const record of rowRawData) {
+      if (record) {
+        for (const rowItem of datePeriodObj) {
+          const rdate = new Date(record.date).toISOString().split('T')[0];
+          if (rowItem.日期 === rdate) {
+            if (typeof record.sales === 'string') {
+              const data: IndexOJ = JSON.parse(record.sales);
+              rowItem.销量 += Object.values(data).reduce((pre: number, cur: number) => {
+                return pre + (+cur);
+              }, 0);
+            }
+          }
+        }
+      }
+    }
+    this.$set(this.chartData, 'rows', datePeriodObj);
+    console.log(this.chartData);
+  }
+
+  datePeriodObjInit(from: Date, to: Date): SalesChartRowItem[] {
+    const datePeriodObj: SalesChartRowItem[] = [];
+    let temp = from;
+    const endDateStr = to.toISOString().split('T')[0];
+    for (let i = 1; temp.toISOString().split('T')[0] <= endDateStr; ++i) {
+      const tempRowItem: SalesChartRowItem = {
+        日期: temp.toISOString().split('T')[0],
+        销量: 0
+      };
+      datePeriodObj.push(tempRowItem);
+      temp = new Date(+from + 3600 * 1000 * 24 * i);
+    }
+    return datePeriodObj;
   }
 
   get HtableDatashow() {

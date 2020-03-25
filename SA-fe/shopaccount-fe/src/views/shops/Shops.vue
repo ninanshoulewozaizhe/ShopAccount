@@ -11,7 +11,7 @@
               :show-file-list="false"
               :on-success="avatarUploadSuccess"
               :before-upload="beforeAvatarUpload">
-              <img v-if="newShop.img" :src=" `/getImg?f=${newShop.img}&t=${Math.random()}`" class="avatar">
+              <img v-if="newShop.img" :src=" `/getImg?f=${newShop.img}`" class="avatar">
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
             <el-form>

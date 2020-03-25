@@ -30,6 +30,7 @@ import {
 import { httpRequestSilence } from '@/utils/httpRequest';
 import { IResponse } from '@/typing/vuex/typings';
 import { SalesRecordItem, ShopsSalesItem } from '@/typing/salesStatus/typings';
+import { IProductDetailItem } from '@/typing/productDetail/typings';
 
 export default {
   namespaced: true,
@@ -160,13 +161,28 @@ export default {
     async [LOAD_ALL_SHOPS_TODAY_SALES]({ commit }, payload: any): Promise<string> {
       try {
         const { data } = await httpRequestSilence.get<IResponse<ShopsSalesItem> >(
-          `/salesRecordsPeriod/${payload.pid}?from=${payload.from}&to=${payload.to}`
+          `/allShopsSalesOneDay?date=${payload.date}`
         );
         if (data.status) {
           commit(MODIFY_ALL_SHOPS_TODAY_SALES, data.data);
           return Promise.resolve('OK');
         } else {
           commit(MODIFY_ALL_SHOPS_TODAY_SALES, null);
+          return Promise.resolve(data.message);
+        }
+      } catch (error) {
+        return Promise.resolve(error);
+      }
+    },
+    async [LOAD_ALL_SHOPS_SALES_RANK]({ commit }, payload: any): Promise<string> {
+      try {
+        const { data } = await httpRequestSilence.get<IResponse<IProductDetailItem[]> >(
+          `/productSalesRank`);
+        if (data.status) {
+          commit(MODIFY_ALL_SHOPS_SALES_RANK, data.data);
+          return Promise.resolve('OK');
+        } else {
+          commit(MODIFY_ALL_SHOPS_SALES_RANK, []);
           return Promise.resolve(data.message);
         }
       } catch (error) {
@@ -189,6 +205,15 @@ export default {
     },
     [MODIFY_PRODUCT_ONE_DAY_SALES](state, payload: SalesRecordItem | null) {
       state.productOneDaySales = payload;
+    },
+    [MODIFY_ALL_SHOPS_TODAY_SALES](state, payload: ShopsSalesItem | null) {
+      state.allShopsTodaySales = payload;
+    },
+    [MODIFY_PRODUCT_PERIOD_SALES](state, payload: SalesRecordItem[]) {
+      state.curProductPeriodSales = payload;
+    },
+    [MODIFY_ALL_SHOPS_SALES_RANK](state, payload: IProductDetailItem[]) {
+      state.productsSalesRank = payload;
     }
   },
   getters: {
@@ -206,6 +231,15 @@ export default {
     },
     [GET_PRODUCT_ONE_DAY_SALES](state): SalesRecordItem | null {
       return state.productOneDaySales;
+    },
+    [GET_PRODUCT_PERIOD_SALES](state): SalesRecordItem[] {
+      return state.curProductPeriodSales;
+    },
+    [GET_ALL_SHOPS_TODAY_SALES](state): ShopsSalesItem | null {
+      return state.allShopsTodaySales;
+    },
+    [GET_ALL_SHOPS_SALES_RANK](state): IProductDetailItem[] {
+      return state.productsSalesRank;
     }
   }
 } as Module<State, any>;

@@ -5,7 +5,7 @@
         <product-card class="p_card"
           :name="product.name" 
           :shop="product.shop"
-          :image="`/getImg?f=${product.img}&t=${Math.random()}`"
+          :image="`/getImg?f=${product.img}`"
           :salesVolume="product.salesVolumes"></product-card>
       </div>
       <el-pagination class="pagination" layout="prev, pager, next" 

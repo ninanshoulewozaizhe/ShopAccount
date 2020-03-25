@@ -9,7 +9,7 @@
           :key="product.id" @click="getProductDetail(product.id)">
           <product-card class="p_card"  
           :name="product.name"
-          :image="`/getImg?f=${product.img}&t=${Math.random()}`"
+          :image="`/getImg?f=${product.img}`"
           :salesVolume="product.salesVolumes"></product-card>
         </div>
         <div class="no_products_tips" v-if="!showProducts.length">
@@ -54,7 +54,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import AppIcon from '../../../public/images/accountBook.jpg';
 import { IProductDetailItem } from '@/typing/productDetail/typings';
-import { SalesRecordItem, OneDaySalesItem } from '@/typing/salesStatus/typings';
+import { SalesRecordItem } from '@/typing/salesStatus/typings';
 import productCard from '@/components/home/productCard.vue';
 import store from '@/store';
 import { LOAD_CUR_SHOP, GET_CUR_SHOP, ADD_NEW_SHOP } from '@/store/modules/shop/constants';

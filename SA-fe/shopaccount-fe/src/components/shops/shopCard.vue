@@ -2,7 +2,7 @@
   <div>
     <el-card class="card" shadow="hover">
       <div class="card_body">
-        <img class="shop_img" :src="`/getImg?f=${shopImg}&t=${Math.random()}`" alt="shopImg">
+        <img class="shop_img" :src="`/getImg?f=${shopImg}`" alt="shopImg">
         <div class="shop_desc">
           <div class="shop_name">{{ name }}</div>
           <div class="shop_Pinfo">
@@ -10,7 +10,7 @@
             <span class="product_amount">共 {{ productAmount }} 件宝贝</span>
           </div>
         </div>
-        <img class="shop_img p_img" v-for="(pImg, index) in preProductImgs" :key="index" :src="`/getImg?f=${pImg}&t=${Math.random()}`" alt="pImg">
+        <img class="shop_img p_img" v-for="(pImg, index) in preProductImgs" :key="index" :src="`/getImg?f=${pImg}`" alt="pImg">
       </div>
     </el-card>
   </div>
