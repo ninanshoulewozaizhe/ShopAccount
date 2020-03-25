@@ -224,7 +224,7 @@ import { SalesRecordItem } from '@/typing/salesStatus/typings';
       vm.salesInit(vm.todaySales, todaySales);
       vm.salesInit(vm.yesterdaySales, yesterdaySales);
       vm.salesInit(vm.updateSales, todaySales);
-      vm.salesDetailTableDataInit(vm.salesDetailRecords);
+      vm.salesDetailTableDataInit(chartRowRawData, new Date(+new Date() - 3600 * 1000 * 24 * 6), new Date());
     });
   }
 })
@@ -246,7 +246,7 @@ export default class ProductDetail extends Vue {
     type: {}
   };
 
- chartRowRawData: SalesRecordItem[] = [];
+ SalesDetailData: SalesRecordItem[] = [];
 
   chartData: ProductSalesChartData = {
     columns: ['日期', '销量'],
@@ -300,7 +300,7 @@ export default class ProductDetail extends Vue {
     }
   };
 
-  salesDatePick = [];
+  salesDatePick = [new Date(+new Date() - 3600 * 1000 * 24 * 6), new Date()];
 
   todaySales: IndexStingOJ = {};
   yesterdaySales: IndexStingOJ = {};
@@ -325,15 +325,54 @@ export default class ProductDetail extends Vue {
     }
   }
 
-  salesDetailTableDataInit(salesRecords: SalesRecordItem[]) {
+  salesDetailTableDataInit(salesRecords: SalesRecordItem[], from: Date, to: Date) {
+    this.salesDetailTableData = [];
+    let temp = from;
+    let tempDateStr = temp.toISOString().split('T')[0];
+    const endDateStr = to.toISOString().split('T')[0];
     for (const item of salesRecords) {
+      const rDate = new Date(item.date).toISOString().split('T')[0];
+      while (rDate !== tempDateStr) {
+        const data = {
+          date: tempDateStr,
+          salesVolumes: 0
+        };
+        for (const type in this.product.type) {
+          if (type) {
+            this.$set(data, type, 0);
+          }
+        }
+        this.salesDetailTableData.push(data);
+        temp = new Date(+temp + 3600 * 1000 * 24);
+        tempDateStr = temp.toISOString().split('T')[0];
+      }
       if (typeof item.sales === 'string') {
         const data = JSON.parse(item.sales);
-        data.date = item.date;
-        data.salesVolumes = item.salesVolumes;
+        const sales = JSON.parse(item.sales);
+        data.date = rDate;
+        data.salesVolumes = Object.values(sales).reduce((pre: number, cur: number) => {
+          return pre + (+cur);
+        }, 0);
         this.salesDetailTableData.push(data);
+        temp = new Date(+temp + 3600 * 1000 * 24);
+        tempDateStr = temp.toISOString().split('T')[0];
       }
     }
+    while (tempDateStr <= endDateStr) {
+      const data = {
+        date: tempDateStr,
+        salesVolumes: 0
+      };
+      for (const type in this.product.type) {
+        if (type) {
+          this.$set(data, type, 0);
+        }
+      }
+      this.salesDetailTableData.push(data);
+      temp = new Date(+temp + 3600 * 1000 * 24);
+      tempDateStr = temp.toISOString().split('T')[0];
+    }
+    console.log(this.salesDetailTableData);
   }
 
   chartDataInit(rowRawData: SalesRecordItem[], from: Date, to: Date) {
@@ -381,8 +420,16 @@ export default class ProductDetail extends Vue {
     return data[this.recentSalesShow];
   }
 
-  datePickerChange() {
+  async datePickerChange() {
     console.log(this.salesDatePick);
+    const fixDatePick = [new Date(+this.salesDatePick[0] + 3600 * 1000 * 24),
+      new Date(+this.salesDatePick[1] + 3600 * 1000 * 24)];
+    const from = fixDatePick[0].toISOString().split('T')[0];
+    const to = fixDatePick[1].toISOString().split('T')[0];
+    await this.$store.dispatch(`salesStatus/${LOAD_PRODUCT_PERIOD_SALES}`, {pid: this.product.id, from, to});
+    const data = store.getters[`salesStatus/${GET_PRODUCT_PERIOD_SALES}`];
+    this.salesDetailTableDataInit(data, fixDatePick[0], fixDatePick[1]);
+    this.chartDataInit(data, fixDatePick[0], fixDatePick[1]);
   }
 
   async updateSalesdatePickerChange() {
@@ -393,13 +440,13 @@ export default class ProductDetail extends Vue {
     const record = this.$store.getters[`salesStatus/${GET_PRODUCT_ONE_DAY_SALES}`];
     console.log('new record:', record);
     if (record && record.sales) {
-      const sales = JSON.parse(record.sales);
-      this.updateSales = {};
-      for (const type in sales) {
-        if (type) {
-          this.$set(this.updateSales, type, sales[type]);
-        }
-      }
+      // const sales = JSON.parse(record.sales);
+      // this.updateSales = {};
+      // for (const type in sales) {
+      //   if (type) {
+      //     this.$set(this.updateSales, type, sales[type]);
+      //   }
+      // }
       this.updateSales = JSON.parse(record.sales);
     } else {
       for (const type in this.product.type) {
