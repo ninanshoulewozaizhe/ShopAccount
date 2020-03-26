@@ -13,3 +13,12 @@ export interface SalesRecordItem {
 export interface ShopsSalesItem {
     [index: string]: SalesRecordItem[];
 }
+
+export interface ShopSalesChartData {
+    columns: string[];
+    rows: ShopSalesChartRowItem[];
+}
+export interface ShopSalesChartRowItem {
+    店铺: string;
+    销量: number;
+}

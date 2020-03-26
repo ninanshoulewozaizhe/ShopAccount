@@ -118,7 +118,7 @@ def getProductSalesRank():
     username = session.get('username')
     uid = get_uid_by_username(username)
     shops = get_user_all_shops(uid)
-    sids = [shop.sid for shop in shops]
+    sids = [shop.id for shop in shops]
     count = request.args.get('count', '10')
     products = get_product_sales_rank(sids, count)
     products = Product.serialize_list(products)

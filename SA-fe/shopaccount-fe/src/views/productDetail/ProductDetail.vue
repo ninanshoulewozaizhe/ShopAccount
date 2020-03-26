@@ -337,7 +337,7 @@ export default class ProductDetail extends Vue {
       }
       if (typeof item.sales === 'string') {
         const data = JSON.parse(item.sales);
-        const sales = JSON.parse(item.sales);
+        const sales: IndexOJ = JSON.parse(item.sales);
         data.date = rDate;
         data.salesVolumes = Object.values(sales).reduce((pre: number, cur: number) => {
           return pre + (+cur);

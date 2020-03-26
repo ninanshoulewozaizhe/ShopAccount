@@ -23,45 +23,77 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { IProductItem } from '@/typing/home/typings';
-import { IProductDetailItem } from '@/typing/productDetail/typings';
+import { IShopPreItem } from '@/typing/shops/typings';
+import { IProductDetailItem, IndexOJ } from '@/typing/productDetail/typings';
+import { SalesRecordItem, ShopsSalesItem,
+  ShopSalesChartData, ShopSalesChartRowItem } from '@/typing/salesStatus/typings';
+import store from '@/store';
+import { LOAD_ALL_SHOPS, GET_ALL_SHOPS } from '@/store/modules/shop/constants';
+import { LOAD_ALL_SHOPS_SALES_RANK, LOAD_ALL_SHOPS_TODAY_SALES,
+  GET_ALL_SHOPS_SALES_RANK, GET_ALL_SHOPS_TODAY_SALES } from '@/store/modules/salesStatus/constants';
 
 @Component({
-  name: 'salesStatus'
+  name: 'salesStatus',
+  async beforeRouteEnter(to: any, from: any, next: any) {
+    const dateStr = new Date().toISOString().split('T')[0];
+    await store.dispatch(`salesStatus/${LOAD_ALL_SHOPS_TODAY_SALES}`, {date: dateStr});
+    await store.dispatch(`shop/${LOAD_ALL_SHOPS}`);
+    await store.dispatch(`salesStatus/${LOAD_ALL_SHOPS_SALES_RANK}`);
+    const allShopsTodaySales = store.getters[`salesStatus/${GET_ALL_SHOPS_TODAY_SALES}`];
+    const shops = store.getters[`shop/${GET_ALL_SHOPS}`];
+    const allShopsSalesRank = store.getters[`salesStatus/${GET_ALL_SHOPS_SALES_RANK}`];
+    console.log(allShopsTodaySales);
+    console.log(shops);
+    console.log(allShopsSalesRank);
+    next((vm: any) => {
+      vm.todayChartDataInit(allShopsTodaySales);
+      vm.totalChartDataInit(shops);
+      vm.tableData = [ ...allShopsSalesRank ].reverse();
+    });
+  }
 })
 export default class SalesStatus extends Vue {
-  todayChartData = {
+  todayChartData: ShopSalesChartData = {
     columns: ['店铺', '销量'],
-    rows: [
-      { 店铺: '潮流最前线', 销量: 191},
-      { 店铺: '喵喵之家', 销量: 121},
-      { 店铺: '满天星', 销量: 142},
-      { 店铺: '爱恋之城', 销量: 35}
-    ]
+    rows: []
   };
 
-  totalChartData = {
+  totalChartData: ShopSalesChartData = {
     columns: ['店铺', '销量'],
-    rows: [
-      { 店铺: '潮流最前线', 销量: 876},
-      { 店铺: '喵喵之家', 销量: 475},
-      { 店铺: '满天星', 销量: 462},
-      { 店铺: '爱恋之城', 销量: 233}
-    ]
+    rows: []
   };
 
-  tableData: IProductItem[] = [
-    {id: 1, name: '白色商务衬衫', salesVolumes: 266, sid: 1, shop: '潮流最前线'},
-    {id: 2, name: '圆领夹克', salesVolumes: 156, sid: 1, shop: '潮流最前线'},
-    {id: 3, name: '美国进口猫粮', salesVolumes: 132, sid: 2, shop: '喵喵之家'},
-    {id: 4, name: '冰雪之心', salesVolumes: 122, sid: 4, shop: '爱恋之城'},
-    {id: 5, name: '玫瑰花', salesVolumes: 101, sid: 3, shop: '满天星'},
-    {id: 6, name: '美国进口狗粮', salesVolumes: 76, sid: 2, shop: '喵喵之家'},
-    {id: 7, name: '丁香花', salesVolumes: 56, sid: 3, shop: '满天星'},
-    {id: 8, name: '木质猫屋', salesVolumes: 42, sid: 2, shop: '喵喵之家'},
-    {id: 9, name: '黑色嘻哈T恤', salesVolumes: 31, sid: 1, shop: '潮流最前线'},
-    {id: 10, name: '木质猫屋', salesVolumes: 22, sid: 4, shop: '爱恋之城'}
-    ];
+  tableData: IProductDetailItem[] = [];
+
+  todayChartDataInit(data: ShopsSalesItem) {
+    Object.keys(data).map((key) => {
+      const temp: ShopSalesChartRowItem = {
+        店铺: key,
+        销量: 0
+      };
+      for (const record of data[key]) {
+        if (typeof record.sales === 'string') {
+          const sales: IndexOJ = JSON.parse(record.sales);
+          temp.销量 +=  Object.values(sales).reduce((pre: number, cur: number) => {
+            return pre + (+cur);
+          }, 0);
+        }
+      }
+      this.todayChartData.rows.push(temp);
+    });
+  }
+
+  totalChartDataInit(shops: IShopPreItem[]) {
+    for (const shop of shops) {
+      const temp: ShopSalesChartRowItem = {
+        店铺: shop.name,
+        销量: shop.salesVolumes
+      };
+      this.totalChartData.rows.push(temp);
+    }
+  }
+
+
 }
 </script>
 
