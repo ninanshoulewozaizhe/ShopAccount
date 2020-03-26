@@ -128,6 +128,7 @@
           range-separator="至"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
+          :clearable="false"
           :picker-options="datePickerOptions"
           @change="datePickerChange">
         </el-date-picker>
@@ -145,6 +146,7 @@
           range-separator="至"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
+          :clearable="false"
           :picker-options="datePickerOptions"
           @change="datePickerChange">
         </el-date-picker>
@@ -185,7 +187,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import horizontalSaleTable from '@/components/productDetail/horizontalSaleTable.vue';
 import { IProductDetailItem, ISuggestObj, IProductSalesItem,
-  IndexStingOJ, IndexOJ, SalesChartRowItem, ProductSalesChartData } from '@/typing/productDetail/typings';
+  IndexStingOJ, IndexOJ, SalesChartRowItem, SalesChartData } from '@/typing/productDetail/typings';
 import store from '@/store';
 import { LOAD_CUR_PRODUCT, GET_CUR_PRODUCT, UPDATE_PRODUCT } from '@/store/modules/product/constants';
 import { LOAD_CUR_PRODUCT_TODAY_SALES, LOAD_CUR_PRODUCT_YESTERDAY_SALES,
@@ -248,23 +250,10 @@ export default class ProductDetail extends Vue {
 
  SalesDetailData: SalesRecordItem[] = [];
 
-  chartData: ProductSalesChartData = {
+  chartData: SalesChartData = {
     columns: ['日期', '销量'],
     rows: []
   };
-
-  salesDetailRecords: SalesRecordItem[] = [
-    {id: 11, name: '', pid: 3, sid: 1, date: '2020-03-14',
-    sales: '{"L": 4, "M": 12, "S": 6, "XL": 13, "XXL": 12}', salesVolumes: 47},
-    {id: 12, name: '', pid: 3, sid: 1, date: '2020-03-15',
-    sales: '{"L": 12, "M": 8, "S": 6, "XL": 13, "XXL": 11}', salesVolumes: 50},
-    {id: 13, name: '', pid: 3, sid: 1, date: '2020-03-16',
-    sales: '{"L": 10, "M": 12, "S": 14, "XL": 11, "XXL": 0}', salesVolumes: 47},
-    {id: 14, name: '', pid: 3, sid: 1, date: '2020-03-17',
-    sales: '{"L": 12, "M": 32, "S": 14, "XL": 0, "XXL": 12}', salesVolumes: 70},
-    {id: 15, name: '', pid: 3, sid: 1, date: '2020-03-18',
-    sales: '{"L": 13, "M": 12, "S": 15, "XL": 12, "XXL": 0}', salesVolumes: 52}
-  ];
 
   salesDetailTableData: any = [];
 

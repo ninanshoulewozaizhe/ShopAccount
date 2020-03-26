@@ -31,7 +31,7 @@ export interface IProductSalesItem {
     disable?: boolean;
 }
 
-export interface ProductSalesChartData {
+export interface SalesChartData {
     columns: string[];
     rows: SalesChartRowItem[];
 }

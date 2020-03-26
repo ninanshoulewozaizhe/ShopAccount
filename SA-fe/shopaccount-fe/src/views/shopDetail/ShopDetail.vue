@@ -41,6 +41,7 @@
           range-separator="至"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
+          :clearable="false"
           :picker-options="datePickerOptions"
           @change="datePickerChange">
         </el-date-picker>
@@ -53,14 +54,15 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import AppIcon from '../../../public/images/accountBook.jpg';
-import { IProductDetailItem } from '@/typing/productDetail/typings';
+import { IProductDetailItem, SalesChartRowItem,
+  IndexOJ, SalesChartData } from '@/typing/productDetail/typings';
 import { SalesRecordItem } from '@/typing/salesStatus/typings';
 import productCard from '@/components/home/productCard.vue';
 import store from '@/store';
 import { LOAD_CUR_SHOP, GET_CUR_SHOP, ADD_NEW_SHOP } from '@/store/modules/shop/constants';
 import { LOAD_CUR_SHOP_PRE_PRODUCTS, GET_CUR_SHOP_PRODUCTS } from '@/store/modules/product/constants';
-import { LOAD_CUR_SHOP_TODAY_SALES, GET_CUR_SHOP_TODAY_SALES } from '@/store/modules/salesStatus/constants';
-import product from '../../store/modules/product';
+import { LOAD_CUR_SHOP_TODAY_SALES, GET_CUR_SHOP_TODAY_SALES,
+  LOAD_CUR_SHOP_PERIOD_SALES, GET_CUR_SHOP_PERIOD_SALES } from '@/store/modules/salesStatus/constants';
 
 @Component({
   name: 'shopDetail',
@@ -69,18 +71,22 @@ import product from '../../store/modules/product';
   },
   async beforeRouteEnter(to: any, from: any, next: any) {
     const sid = to.params.sid;
+    const todayStr = new Date().toISOString().split('T')[0];
+    const weekAgoStr = new Date(+new Date() - 3600 * 1000 * 24 * 6).toISOString().split('T')[0];
     const dateStr = new Date().toISOString().split('T')[0];
     await store.dispatch(`product/${LOAD_CUR_SHOP_PRE_PRODUCTS}`, sid);
     await store.dispatch(`salesStatus/${LOAD_CUR_SHOP_TODAY_SALES}`, {sid, date: dateStr});
+    await store.dispatch(`salesStatus/${LOAD_CUR_SHOP_PERIOD_SALES}`, {sid, from: weekAgoStr, to: todayStr});
     const products = store.getters[`product/${GET_CUR_SHOP_PRODUCTS}`];
     const todaySales = store.getters[`salesStatus/${GET_CUR_SHOP_TODAY_SALES}`];
-    console.log(products);
-    console.log(todaySales);
+    const chartRowRawData = store.getters[`salesStatus/${GET_CUR_SHOP_PERIOD_SALES}`];
     next((vm: any) => {
+      vm.SID = sid;
       vm.showProducts = JSON.parse(JSON.stringify(products));
       vm.allTableData = JSON.parse(JSON.stringify(todaySales));
       vm.tableDataformat();
       vm.showTableInit();
+      vm.chartDataInit(chartRowRawData, new Date(+new Date() - 3600 * 1000 * 24 * 6), new Date());
     });
   }
 })
@@ -89,16 +95,11 @@ export default class ShopDetail extends Vue {
   showtableSize = 4;
   showTable: SalesRecordItem[]  = [];
   showProducts: IProductDetailItem[] = [];
+  SID = -1;
 
-  chartData = {
+  chartData: SalesChartData = {
     columns: ['日期', '销量'],
-    rows: [
-      { 日期: '2019-03-14', 销量: 58},
-      { 日期: '2019-03-15', 销量: 81},
-      { 日期: '2019-03-16', 销量: 203},
-      { 日期: '2019-03-17', 销量: 161},
-      { 日期: '2019-03-18', 销量: 191}
-    ]
+    rows: []
   };
 
 
@@ -108,7 +109,7 @@ export default class ShopDetail extends Vue {
       onClick(picker: any) {
         const end = new Date();
         const start = new Date();
-        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+        start.setTime(start.getTime() - 3600 * 1000 * 24 * 6);
         picker.$emit('pick', [start, end]);
       }
     }, {
@@ -128,7 +129,7 @@ export default class ShopDetail extends Vue {
     }
   };
 
-  salesDatePick = [];
+  salesDatePick = [new Date(+new Date() - 3600 * 1000 * 24 * 6), new Date()];
 
   mounted() {
     this.showTableInit();
@@ -168,8 +169,51 @@ export default class ShopDetail extends Vue {
     }
   }
 
-  datePickerChange() {
-    console.log(this.salesDatePick);
+  async datePickerChange() {
+    const fixDatePick = [new Date(+this.salesDatePick[0] + 3600 * 1000 * 24),
+      new Date(+this.salesDatePick[1] + 3600 * 1000 * 24)];
+    const from = fixDatePick[0].toISOString().split('T')[0];
+    const to = fixDatePick[1].toISOString().split('T')[0];
+    await this.$store.dispatch(`salesStatus/${LOAD_CUR_SHOP_PERIOD_SALES}`, {sid: this.SID, from, to});
+    const data = store.getters[`salesStatus/${GET_CUR_SHOP_PERIOD_SALES}`];
+    this.chartDataInit(data, fixDatePick[0], fixDatePick[1]);
+    console.log(data);
+  }
+
+  chartDataInit(rowRawData: SalesRecordItem[], from: Date, to: Date) {
+    const datePeriodObj: SalesChartRowItem[] = this.datePeriodObjInit(from, to);
+    for (const record of rowRawData) {
+      if (record) {
+        for (const rowItem of datePeriodObj) {
+          const rdate = new Date(record.date).toISOString().split('T')[0];
+          if (rowItem.日期 === rdate) {
+            if (typeof record.sales === 'string') {
+              const data: IndexOJ = JSON.parse(record.sales);
+              rowItem.销量 += Object.values(data).reduce((pre: number, cur: number) => {
+                return pre + (+cur);
+              }, 0);
+            }
+          }
+        }
+      }
+    }
+    this.$set(this.chartData, 'rows', datePeriodObj);
+    console.log(this.chartData);
+  }
+
+  datePeriodObjInit(from: Date, to: Date): SalesChartRowItem[] {
+    const datePeriodObj: SalesChartRowItem[] = [];
+    let temp = from;
+    const endDateStr = to.toISOString().split('T')[0];
+    for (let i = 1; temp.toISOString().split('T')[0] <= endDateStr; ++i) {
+      const tempRowItem: SalesChartRowItem = {
+        日期: temp.toISOString().split('T')[0],
+        销量: 0
+      };
+      datePeriodObj.push(tempRowItem);
+      temp = new Date(+from + 3600 * 1000 * 24 * i);
+    }
+    return datePeriodObj;
   }
 
   getProductDetail(pid: number) {
