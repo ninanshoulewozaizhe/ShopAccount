@@ -107,4 +107,7 @@ export default class SalesStatus extends Vue {
     margin-right: 100px;
   }
 }
+.el-table::before {
+  width: 0;
+}
 </style>
