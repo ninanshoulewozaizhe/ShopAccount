@@ -29,6 +29,8 @@ from app.route.requestHandler import after_request
 from app.database import app_db_init
 from app.route import bp_register
 
+from werkzeug.middleware.proxy_fix import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app)
 app.after_request(after_request)
 app_db_init()
 bp_register()
