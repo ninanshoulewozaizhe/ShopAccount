@@ -22,6 +22,8 @@ def createShop():
     username = session.get('username')
     uid = get_uid_by_username(username)
     shopInfo = form2Dict(request.json, {'name': '', 'description': '', 'img': 'default-shop.jpeg', 'uid': uid})
+    if shopInfo['img'] == '':
+        shopInfo['img'] = 'default-shop.jpeg'
     logger.info(f'user: {username} try to create shop:{shopInfo}')
     sid = create_shop(shopInfo)
     logger.info(f'shop-id: {sid} created')

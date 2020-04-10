@@ -25,6 +25,8 @@ def createProduct():
     productInfo = form2Dict(request.json, {'name': '', 'status':'on-sale', 'description': '', \
         'img': 'default-product.png', 'sid': '-1', 'shop': '', 'type':'', 'salesVolumes': 0})
     productInfo['type'] = json.dumps(ast.literal_eval(productInfo['type']))
+    if productInfo['img'] == '':
+        productInfo['img'] = 'default-product.png'
     pid = create_product(productInfo)
     increase_shop_product_amount(productInfo['sid'], 1)
     return jsonify(status=True, message='succeed', data={'pid': pid})
